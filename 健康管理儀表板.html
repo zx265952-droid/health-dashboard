@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>呂昇鴻 · 健康管理儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:       #F0EBE3;
+    --parchment:   #E8E0D5;
+    --taupe:       #C4B8AC;
+    --stone:       #9E9088;
+    --charcoal:    #5A5250;
+    --deep:        #3D3533;
+
+    --rose:        #C4A09B;
+    --rose-light:  #DDC5C0;
+    --rose-deep:   #A67F7A;
+
+    --sage:        #8FA898;
+    --sage-light:  #BDD0C4;
+    --sage-deep:   #6B8A78;
+
+    --blue:        #8097AA;
+    --blue-light:  #B5C7D4;
+    --blue-deep:   #5D7A90;
+
+    --lavender:    #A89BB5;
+    --lavender-light: #CABDD6;
+
+    --amber:       #C4AA80;
+    --amber-light: #DDD0B0;
+
+    --warn-red:    #C07070;
+    --warn-yellow: #C4AA60;
+    --ok-green:    #7A9E8A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Serif TC', serif;
+    background-color: var(--cream);
+    color: var(--deep);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--charcoal);
+    color: var(--parchment);
+    padding: 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(196,160,155,0.15);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 20%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(143,168,152,0.12);
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--taupe);
+    margin-bottom: 0.5rem;
+  }
+  .header-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  .header-name span {
+    font-style: italic;
+    color: var(--rose-light);
+  }
+  .header-meta {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--taupe);
+    line-height: 1.9;
+  }
+  .header-meta strong {
+    color: var(--parchment);
+    font-weight: 400;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    background: var(--parchment);
+    border-bottom: 1px solid var(--taupe);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+  }
+  .nav-tab {
+    padding: 1rem 1.8rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.25s;
+    color: var(--stone);
+    user-select: none;
+  }
+  .nav-tab:hover { color: var(--charcoal); }
+  .nav-tab.active {
+    color: var(--charcoal);
+    border-bottom-color: var(--rose);
+    background: rgba(196,160,155,0.08);
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── SECTION HEADER ── */
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 0.4rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--charcoal);
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--taupe);
+  }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+  }
+  .ov-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid var(--parchment);
+    position: relative;
+    overflow: hidden;
+  }
+  .ov-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+  }
+  .ov-card.rose::before  { background: var(--rose); }
+  .ov-card.sage::before  { background: var(--sage); }
+  .ov-card.blue::before  { background: var(--blue); }
+  .ov-card.amber::before { background: var(--amber); }
+
+  .ov-label { font-size: 0.75rem; color: var(--stone); letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+  .ov-value { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 300; line-height: 1; }
+  .ov-card.rose  .ov-value { color: var(--rose-deep); }
+  .ov-card.sage  .ov-value { color: var(--sage-deep); }
+  .ov-card.blue  .ov-value { color: var(--blue-deep); }
+  .ov-card.amber .ov-value { color: #9E8050; }
+  .ov-sub { font-size: 0.72rem; color: var(--stone); margin-top: 0.3rem; }
+
+  /* ── ABNORMAL HIGHLIGHT ── */
+  .alert-section {
+    background: white;
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    border: 1px solid var(--parchment);
+  }
+  .alert-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .alert-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--warn-red);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .alert-title { font-size: 0.85rem; letter-spacing: 0.1em; color: var(--charcoal); }
+
+  .abnormal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .abn-item {
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    border-left: 4px solid var(--warn-red);
+    position: relative;
+  }
+  .abn-item.warn { border-left-color: var(--warn-yellow); }
+  .abn-item.info { border-left-color: var(--blue); }
+  .abn-item.ok   { border-left-color: var(--ok-green); }
+
+  .abn-name { font-size: 0.78rem; color: var(--stone); margin-bottom: 0.3rem; }
+  .abn-value { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--charcoal); }
+  .abn-range { font-size: 0.7rem; color: var(--stone); margin-top: 0.2rem; }
+  .abn-badge {
+    display: inline-block;
+    font-size: 0.62rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin-top: 0.4rem;
+  }
+  .badge-high { background: rgba(192,112,112,0.15); color: var(--warn-red); }
+  .badge-low  { background: rgba(122,158,138,0.15); color: var(--ok-green); }
+  .badge-critical { background: rgba(192,112,112,0.25); color: #9E4040; }
+
+  /* ── DATA TABLE ── */
+  .data-group {
+    background: white;
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--parchment);
+  }
+  .data-group-title {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .data-group-title::before {
+    content: '';
+    width: 24px; height: 2px;
+    background: var(--taupe);
+    display: inline-block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  thead th {
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--stone);
+    text-align: left;
+    padding: 0.6rem 1rem;
+    border-bottom: 2px solid var(--parchment);
+  }
+  tbody tr {
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: var(--cream); }
+  tbody td {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid var(--parchment);
+    color: var(--charcoal);
+    vertical-align: middle;
+  }
+  tbody td:first-child { color: var(--stone); font-size: 0.78rem; }
+  .val-high { color: var(--warn-red); font-weight: 400; }
+  .val-low  { color: var(--blue-deep); font-weight: 400; }
+  .val-ok   { color: var(--sage-deep); }
+  .tag-high, .tag-low, .tag-ok {
+    display: inline-block;
+    font-size: 0.62rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 20px;
+    margin-left: 0.4rem;
+  }
+  .tag-high { background: rgba(192,112,112,0.15); color: var(--warn-red); }
+  .tag-low  { background: rgba(125,157,181,0.15); color: var(--blue-deep); }
+  .tag-ok   { background: rgba(122,158,138,0.15); color: var(--sage-deep); }
+
+  /* ── TREND BARS ── */
+  .trend-section {
+    background: white;
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--parchment);
+  }
+  .trend-item {
+    margin-bottom: 1.5rem;
+  }
+  .trend-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--stone);
+    margin-bottom: 0.4rem;
+  }
+  .trend-name { color: var(--charcoal); font-weight: 400; }
+  .trend-bar-bg {
+    background: var(--parchment);
+    border-radius: 99px;
+    height: 8px;
+    position: relative;
+  }
+  .trend-normal {
+    position: absolute;
+    background: rgba(143,168,152,0.3);
+    height: 100%;
+    border-radius: 99px;
+  }
+  .trend-bar {
+    height: 100%;
+    border-radius: 99px;
+    position: absolute;
+    top: 0; left: 0;
+    transition: width 1s ease;
+  }
+  .trend-bar.danger  { background: var(--rose); }
+  .trend-bar.warn    { background: var(--amber); }
+  .trend-bar.ok      { background: var(--sage); }
+  .trend-dates {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 0.6rem;
+    flex-wrap: wrap;
+  }
+  .trend-point {
+    font-size: 0.7rem;
+    color: var(--stone);
+    background: var(--cream);
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    border: 1px solid var(--parchment);
+  }
+  .trend-point.high { color: var(--warn-red); border-color: rgba(192,112,112,0.3); background: rgba(192,112,112,0.06); }
+
+  /* ── SUPPLEMENT CARDS ── */
+  .supp-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.4rem;
+    margin-bottom: 2.5rem;
+  }
+  .supp-card {
+    background: white;
+    border-radius: 14px;
+    padding: 1.8rem;
+    border: 1px solid var(--parchment);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .supp-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  .supp-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+  .supp-card.c1::after { background: var(--blue); }
+  .supp-card.c2::after { background: var(--sage); }
+  .supp-card.c3::after { background: var(--rose); }
+  .supp-card.c4::after { background: var(--lavender); }
+  .supp-card.c5::after { background: var(--amber); }
+  .supp-card.c6::after { background: var(--taupe); }
+
+  .supp-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  .supp-card.c1 .supp-icon { background: rgba(128,151,170,0.15); }
+  .supp-card.c2 .supp-icon { background: rgba(143,168,152,0.15); }
+  .supp-card.c3 .supp-icon { background: rgba(196,160,155,0.15); }
+  .supp-card.c4 .supp-icon { background: rgba(168,155,181,0.15); }
+  .supp-card.c5 .supp-icon { background: rgba(196,170,128,0.15); }
+  .supp-card.c6 .supp-icon { background: rgba(196,184,172,0.15); }
+
+  .supp-name {
+    font-size: 0.95rem;
+    color: var(--charcoal);
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+  .supp-dose {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--stone);
+    margin-bottom: 0.8rem;
+  }
+  .supp-reason {
+    font-size: 0.78rem;
+    color: var(--stone);
+    line-height: 1.6;
+  }
+  .supp-target {
+    display: inline-block;
+    font-size: 0.68rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    background: var(--cream);
+    color: var(--charcoal);
+    border: 1px solid var(--parchment);
+    margin-top: 0.8rem;
+  }
+
+  /* ── AVOID LIST ── */
+  .avoid-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .avoid-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid var(--parchment);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .avoid-x {
+    width: 28px; height: 28px;
+    background: rgba(192,112,112,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    color: var(--warn-red);
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+  .avoid-name { font-size: 0.85rem; color: var(--charcoal); margin-bottom: 0.2rem; font-weight: 400; }
+  .avoid-why  { font-size: 0.75rem; color: var(--stone); }
+
+  /* ── PRIORITY STEPS ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .step {
+    background: white;
+    border-radius: 12px;
+    padding: 1.4rem 1.6rem;
+    border: 1px solid var(--parchment);
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--taupe);
+    min-width: 32px;
+  }
+  .step-content { flex: 1; }
+  .step-title { font-size: 0.88rem; color: var(--charcoal); font-weight: 400; margin-bottom: 0.2rem; }
+  .step-desc  { font-size: 0.78rem; color: var(--stone); line-height: 1.6; }
+  .step-tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--taupe);
+    color: var(--stone);
+    margin-left: 0.5rem;
+  }
+
+  /* ── PROTEIN GUIDE ── */
+  .protein-box {
+    background: white;
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--parchment);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .protein-col h4 {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--stone);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+  .protein-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--parchment);
+    font-size: 0.82rem;
+    color: var(--charcoal);
+  }
+  .protein-row span { color: var(--stone); font-size: 0.78rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--charcoal);
+    color: var(--stone);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    margin-top: 4rem;
+  }
+  footer strong { color: var(--taupe); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .section.active > * {
+    animation: fadeUp 0.4s ease both;
+  }
+  .section.active > *:nth-child(2) { animation-delay: 0.06s; }
+  .section.active > *:nth-child(3) { animation-delay: 0.12s; }
+  .section.active > *:nth-child(4) { animation-delay: 0.18s; }
+  .section.active > *:nth-child(5) { animation-delay: 0.24s; }
+
+  @media (max-width: 768px) {
+    .overview-grid   { grid-template-columns: repeat(2,1fr); }
+    .abnormal-grid   { grid-template-columns: 1fr; }
+    .supp-grid       { grid-template-columns: 1fr; }
+    .avoid-grid      { grid-template-columns: 1fr; }
+    .protein-box     { grid-template-columns: 1fr; }
+    .header-inner    { flex-direction: column; gap: 1.5rem; }
+    .header-meta     { text-align: left; }
+    header           { padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-title">Personal Health Dashboard</div>
+      <div class="header-name">呂昇鴻 <span>健康管理</span></div>
+    </div>
+    <div class="header-meta">
+      <div>性別 <strong>男</strong>　年齡 <strong>60 歲</strong></div>
+      <div>資料期間 <strong>114/07 — 115/03</strong></div>
+      <div>資料來源 <strong>健檢 Excel ＋ 聯合醫事檢驗所</strong></div>
+      <div style="margin-top:0.5rem; color:var(--rose-light)">最新採檢 2026/03/26</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-tab active" onclick="switchTab('overview')">總覽</div>
+    <div class="nav-tab" onclick="switchTab('kidney')">腎功能</div>
+    <div class="nav-tab" onclick="switchTab('blood')">血脂 · 血糖</div>
+    <div class="nav-tab" onclick="switchTab('lab')">最新報告</div>
+    <div class="nav-tab" onclick="switchTab('supp')">保健攝取</div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ══════ 總覽 ══════ -->
+  <section class="section active" id="overview">
+    <div class="section-label">Overview</div>
+    <div class="section-title">健康狀態總覽</div>
+
+    <div class="overview-grid">
+      <div class="ov-card rose">
+        <div class="ov-label">腎絲球過濾率 eGFR</div>
+        <div class="ov-value">49.77</div>
+        <div class="ov-sub">ml/min/1.73m² · 最新 115/03（估算）</div>
+        <div class="ov-sub" style="color:var(--warn-red); margin-top:0.4rem">CKD 第 3a 期</div>
+      </div>
+      <div class="ov-card sage">
+        <div class="ov-label">Homocysteine 同半胱胺酸</div>
+        <div class="ov-value">25.3</div>
+        <div class="ov-sub">umol/L · 2026/03/26</div>
+        <div class="ov-sub" style="color:var(--warn-red); margin-top:0.4rem">偏高 H（正常 ≤19.5）</div>
+      </div>
+      <div class="ov-card blue">
+        <div class="ov-label">24小時尿蛋白（最新）</div>
+        <div class="ov-value">109.2</div>
+        <div class="ov-sub">MG/Day · 114/12/22</div>
+        <div class="ov-sub" style="color:var(--ok-green); margin-top:0.4rem">↓ 較8月248.1 顯著改善</div>
+      </div>
+      <div class="ov-card amber">
+        <div class="ov-label">血中尿素氮 BUN</div>
+        <div class="ov-value">27.8</div>
+        <div class="ov-sub">MG/DL · 114/12/22</div>
+        <div class="ov-sub" style="color:var(--warn-red); margin-top:0.4rem">持續偏高（正常 5–20）</div>
+      </div>
+    </div>
+
+    <div class="alert-section">
+      <div class="alert-header">
+        <div class="alert-dot"></div>
+        <div class="alert-title">異常指標速覽 — 需持續追蹤</div>
+      </div>
+      <div class="abnormal-grid">
+        <div class="abn-item">
+          <div class="abn-name">eGFR（腎絲球過濾率）</div>
+          <div class="abn-value">49.77 <small style="font-size:0.9rem; color:var(--stone)">ml/min</small></div>
+          <div class="abn-range">正常 ≥ 101</div>
+          <span class="abn-badge badge-critical">持續低於 60 · CKD G3a</span>
+        </div>
+        <div class="abn-item">
+          <div class="abn-name">Homocysteine（同半胱胺酸）</div>
+          <div class="abn-value">25.3 <small style="font-size:0.9rem; color:var(--stone)">umol/L</small></div>
+          <div class="abn-range">正常 6.5–19.5</div>
+          <span class="abn-badge badge-high">心血管 · 腎臟微血管風險</span>
+        </div>
+        <div class="abn-item">
+          <div class="abn-name">血中尿素氮 BUN</div>
+          <div class="abn-value">27.8 <small style="font-size:0.9rem; color:var(--stone)">MG/DL</small></div>
+          <div class="abn-range">正常 5–20 · 呈上升趨勢</div>
+          <span class="abn-badge badge-high">最新值上升</span>
+        </div>
+        <div class="abn-item warn">
+          <div class="abn-name">M/C ratio（微白蛋白/肌酸酐比）</div>
+          <div class="abn-value">199.2 <small style="font-size:0.9rem; color:var(--stone)">%</small></div>
+          <div class="abn-range">正常 0–30（114/08）</div>
+          <span class="abn-badge badge-high">嚴重偏高</span>
+        </div>
+        <div class="abn-item warn">
+          <div class="abn-name">LDL 低密度脂蛋白</div>
+          <div class="abn-value">163 <small style="font-size:0.9rem; color:var(--stone)">MG/DL</small></div>
+          <div class="abn-range">正常 50–129（114/07）</div>
+          <span class="abn-badge badge-high">偏高</span>
+        </div>
+        <div class="abn-item warn">
+          <div class="abn-name">嗜酸性白血球計算</div>
+          <div class="abn-value">430–560</div>
+          <div class="abn-range">正常 50–350（114/10–12）</div>
+          <span class="abn-badge badge-high">持續偏高 · 需釐清原因</span>
+        </div>
+        <div class="abn-item info">
+          <div class="abn-name">飯前血糖 Glucose</div>
+          <div class="abn-value">102 <small style="font-size:0.9rem; color:var(--stone)">MG/DL</small></div>
+          <div class="abn-range">正常 60–99（三次均同）</div>
+          <span class="abn-badge" style="background:rgba(128,151,170,0.15); color:var(--blue-deep)">糖尿病前期邊緣</span>
+        </div>
+        <div class="abn-item info">
+          <div class="abn-name">HDL 高密度脂蛋白</div>
+          <div class="abn-value">35 <small style="font-size:0.9rem; color:var(--stone)">MG/DL</small></div>
+          <div class="abn-range">正常 ≥ 40（114/07）</div>
+          <span class="abn-badge badge-low">偏低</span>
+        </div>
+        <div class="abn-item ok">
+          <div class="abn-name">24小時尿蛋白（最新）</div>
+          <div class="abn-value">109.2 <small style="font-size:0.9rem; color:var(--stone)">MG/Day</small></div>
+          <div class="abn-range">正常 0–150（114/12）</div>
+          <span class="abn-badge" style="background:rgba(122,158,138,0.15); color:var(--ok-green)">↓ 回歸正常</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 腎功能 ══════ -->
+  <section class="section" id="kidney">
+    <div class="section-label">Kidney Function</div>
+    <div class="section-title">腎功能追蹤</div>
+
+    <div class="trend-section">
+      <div class="data-group-title">eGFR 腎絲球過濾率趨勢（正常值 ≥ 101）</div>
+      <div class="trend-item">
+        <div class="trend-meta">
+          <span class="trend-name">eGFR</span>
+          <span>目標 ≥ 60 ml/min/1.73m²</span>
+        </div>
+        <div class="trend-dates">
+          <span class="trend-point high">114/07 49.76</span>
+          <span class="trend-point high">114/07/28 50.91</span>
+          <span class="trend-point high">114/08 54.94</span>
+          <span class="trend-point high">114/09 55.63</span>
+          <span class="trend-point high">114/10 55.17</span>
+          <span class="trend-point high">114/12 49.77 ↓</span>
+        </div>
+      </div>
+
+      <div class="trend-item" style="margin-top:1.5rem">
+        <div class="trend-meta">
+          <span class="trend-name">血清肌酸酐 CRE（正常 0.6–1.5 mg/dL）</span>
+        </div>
+        <div class="trend-dates">
+          <span class="trend-point high">114/07 1.53</span>
+          <span class="trend-point">114/07/28 1.50</span>
+          <span class="trend-point">114/08 1.40</span>
+          <span class="trend-point">114/09 1.44</span>
+          <span class="trend-point">114/10 1.45</span>
+          <span class="trend-point high">114/12 1.58 ↑</span>
+        </div>
+      </div>
+
+      <div class="trend-item" style="margin-top:1.5rem">
+        <div class="trend-meta">
+          <span class="trend-name">血中尿素氮 BUN（正常 5–20 mg/dL）</span>
+        </div>
+        <div class="trend-dates">
+          <span class="trend-point high">114/07 —</span>
+          <span class="trend-point high">114/07/28 20.9</span>
+          <span class="trend-point high">114/08 21.0</span>
+          <span class="trend-point high">114/09 22.9</span>
+          <span class="trend-point high">114/12 27.8 ↑</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="data-group">
+      <div class="data-group-title">蛋白尿相關指標</div>
+      <table>
+        <thead>
+          <tr>
+            <th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>114/07/03</td><td>微白蛋白</td><td class="val-high">186.5</td><td>MG/L</td><td>0–25</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+          <tr><td>114/08/22</td><td>微白蛋白</td><td class="val-high">77.9</td><td>MG/L</td><td>0–25</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/07/03</td><td>24小時尿蛋白</td><td class="val-high">—</td><td>MG/Day</td><td>0–150</td><td>—</td></tr>
+          <tr><td>114/08/22</td><td>24小時尿蛋白</td><td class="val-high">248.1</td><td>MG/Day</td><td>0–150</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/12/22</td><td>24小時尿蛋白</td><td class="val-ok">109.2</td><td>MG/Day</td><td>0–150</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+          <tr><td>114/07/03</td><td>M/C ratio</td><td class="val-high">224.7</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+          <tr><td>114/08/22</td><td>M/C ratio</td><td class="val-high">199.2</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="data-group">
+      <div class="data-group-title">副甲狀腺素 i-PTH（腎病繼發指標）</div>
+      <table>
+        <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>114/09/10</td><td>i-PTH（Excel）</td><td class="val-high">82.9</td><td>pg/mL</td><td>15–68</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>2026/03/26</td><td>PTH-i（聯合醫事）</td><td class="val-ok">50.9</td><td>pg/mL</td><td>18.5–88.0</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:0.78rem; color:var(--stone); margin-top:1rem; padding: 0.8rem 1rem; background:var(--cream); border-radius:8px;">
+        💡 PTH 改善提示維生素D補充有效。目前 25-OH Vit D = 43.4 ng/mL（充足），維持現狀即可。
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 血脂血糖 ══════ -->
+  <section class="section" id="blood">
+    <div class="section-label">Lipids & Glucose</div>
+    <div class="section-title">血脂 · 血糖追蹤</div>
+
+    <div class="data-group">
+      <div class="data-group-title">血脂四項（114/07/03）</div>
+      <table>
+        <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>114/07/03</td><td>總膽固醇</td><td class="val-high">224</td><td>MG/DL</td><td>100–200</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/07/03</td><td>LDL 低密度脂蛋白</td><td class="val-high">163</td><td>MG/DL</td><td>50–129</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/07/03</td><td>HDL 高密度脂蛋白</td><td class="val-low">35</td><td>MG/DL</td><td>≥ 40</td><td><span class="tag-low">偏低</span></td></tr>
+          <tr><td>114/09/10</td><td>三酸甘油脂 TG</td><td>—</td><td>MG/DL</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="data-group">
+      <div class="data-group-title">血糖相關（多次偵測）</div>
+      <table>
+        <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>114/07/03</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
+          <tr><td>114/08/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
+          <tr><td>114/12/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">持續邊緣</span></td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:0.78rem; color:var(--stone); margin-top:1rem; padding: 0.8rem 1rem; background:var(--cream); border-radius:8px;">
+        ⚠️ 三次血糖均為 102 mg/dL，屬糖尿病前期（Pre-diabetes）警戒範圍。建議追蹤 HbA1c 醣化血色素。
+      </div>
+    </div>
+
+    <div class="data-group">
+      <div class="data-group-title">嗜酸性白血球（需追蹤）</div>
+      <table>
+        <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>114/09/10</td><td>嗜酸性白血球 %</td><td class="val-high">7.1</td><td>%</td><td>0–5</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/10/29</td><td>嗜酸性白血球計算</td><td class="val-high">560</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">偏高</span></td></tr>
+          <tr><td>114/12/22</td><td>嗜酸性白血球計算</td><td class="val-high">430</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">仍偏高</span></td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:0.78rem; color:var(--stone); margin-top:1rem; padding: 0.8rem 1rem; background:var(--cream); border-radius:8px;">
+        💡 需告知醫師是否長期服用 NSAIDs、抗生素或利尿劑，排除過敏性間質性腎炎。
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 最新報告 ══════ -->
+  <section class="section" id="lab">
+    <div class="section-label">Latest Report · 2026/03/26 — 2026/03/28</div>
+    <div class="section-title">聯合醫事檢驗所 最新報告</div>
+
+    <div class="data-group">
+      <div class="data-group-title">一般生化</div>
+      <table>
+        <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>IgG/A/M Kappa/Lambda (EP)</td><td>No Paraprotein</td><td>—</td><td>—</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>Total Protein (EP) 總蛋白</td><td class="val-ok">7.1</td><td>g/dL</td><td>5.7–8.2</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>M Protein %</td><td class="val-ok">0.0</td><td>%</td><td>0.0</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>Calcium 鈣</td><td class="val-ok">9.4</td><td>mg/dL</td><td>8.7–10.4</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>Phosphorus 磷</td><td class="val-ok">3.1</td><td>mg/dL</td><td>2.4–5.1</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>γ-GT 肝膽酵素</td><td class="val-ok">20</td><td>U/L</td><td>M: &lt;73</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>LDH 乳酸去氫酵素</td><td class="val-ok">186</td><td>U/L</td><td>120–246</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>Magnesium 鎂</td><td class="val-ok">2.2</td><td>mg/dL</td><td>1.8–2.4</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>A/G Ratio</td><td class="val-ok">1.20</td><td>—</td><td>—</td><td><span class="tag-ok">正常</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="data-group">
+      <div class="data-group-title">免疫 · 特殊項目</div>
+      <table>
+        <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--warn-red); font-weight:400">Homocysteine 同半胱胺酸</td><td class="val-high">25.3</td><td>umol/L</td><td>6.5–19.5</td><td><span class="tag-high">偏高 H</span></td></tr>
+          <tr><td>PTH-i 副甲狀腺素</td><td class="val-ok">50.9</td><td>pg/mL</td><td>18.5–88.0</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+          <tr><td>hs-CRP 高敏感度</td><td class="val-ok">0.050</td><td>mg/dL</td><td>≤0.330</td><td><span class="tag-ok">低風險</span></td></tr>
+          <tr><td>C3 補體</td><td class="val-ok">132.0</td><td>mg/dL</td><td>80–170</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>IgA</td><td class="val-ok">289</td><td>mg/dL</td><td>40–350</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>IgE 過敏球蛋白E</td><td class="val-ok">51.1</td><td>IU/mL</td><td>&lt;158.0</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>25-OH Vitamin D Total</td><td class="val-ok">43.4</td><td>ng/mL</td><td>充足 30–100</td><td><span class="tag-ok">充足</span></td></tr>
+          <tr><td>M-peak</td><td>Negative</td><td>—</td><td>Negative</td><td><span class="tag-ok">正常</span></td></tr>
+          <tr><td>Albumin(S)</td><td class="val-ok">55.0</td><td>%</td><td>47.0–61.6</td><td><span class="tag-ok">正常</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 血清蛋白電泳 -->
+    <div class="data-group">
+      <div class="data-group-title">血清蛋白電泳（SPEP）· QuickScan 2000 WIN · 2026/03/28</div>
+
+      <!-- 結果橫幅 -->
+      <div style="display:flex; align-items:center; gap:1rem; background:rgba(122,158,138,0.1); border:1px solid rgba(122,158,138,0.3); border-radius:10px; padding:1rem 1.4rem; margin-bottom:1.6rem;">
+        <div style="font-size:1.8rem;">✅</div>
+        <div>
+          <div style="font-size:0.92rem; color:var(--sage-deep); font-weight:400; letter-spacing:0.05em;">No Paraprotein — 未發現單株免疫球蛋白</div>
+          <div style="font-size:0.75rem; color:var(--stone); margin-top:0.2rem;">
+            免疫固定電泳（IFE）：SP · IgG · IgA · IgM · Kappa · Lambda 六道均呈陰性，排除多發性骨髓瘤（Multiple Myeloma）及漿細胞病變
+          </div>
+        </div>
+      </div>
+
+      <!-- 電泳視覺化條形圖 -->
+      <div style="margin-bottom:1.6rem;">
+        <div style="font-size:0.72rem; color:var(--stone); letter-spacing:0.1em; margin-bottom:1rem; text-transform:uppercase;">蛋白分區分布（Total = 7.1 g/dL）</div>
+        <div style="display:grid; grid-template-columns: 110px 1fr 60px 80px; gap:0.4rem 1rem; align-items:center; font-size:0.8rem;">
+
+          <!-- Headers -->
+          <div style="color:var(--stone); font-size:0.7rem;">分區</div>
+          <div style="color:var(--stone); font-size:0.7rem;">佔比</div>
+          <div style="color:var(--stone); font-size:0.7rem; text-align:right;">%</div>
+          <div style="color:var(--stone); font-size:0.7rem; text-align:right;">g/dL</div>
+
+          <!-- ALBUMIN -->
+          <div style="color:var(--charcoal);">Albumin 白蛋白</div>
+          <div style="background:var(--parchment); border-radius:99px; height:10px; position:relative; overflow:hidden;">
+            <div style="position:absolute; left:0; top:0; height:100%; width:55%; background:var(--blue); border-radius:99px; opacity:0.7;"></div>
+            <div style="position:absolute; left:47%; top:0; height:100%; width:14.6%; background:rgba(122,158,138,0.3); border-radius:0;"></div>
+          </div>
+          <div style="text-align:right; color:var(--blue-deep);">55.0%</div>
+          <div style="text-align:right; color:var(--stone);">3.9</div>
+
+          <!-- ALPHA 1 -->
+          <div style="color:var(--charcoal);">Alpha-1</div>
+          <div style="background:var(--parchment); border-radius:99px; height:10px; position:relative; overflow:hidden;">
+            <div style="position:absolute; left:0; top:0; height:100%; width:3.3%; background:var(--sage); border-radius:99px; opacity:0.7;"></div>
+            <div style="position:absolute; left:2%; top:0; height:100%; width:2.4%; background:rgba(122,158,138,0.3); border-radius:0;"></div>
+          </div>
+          <div style="text-align:right; color:var(--sage-deep);">3.3%</div>
+          <div style="text-align:right; color:var(--stone);">0.2</div>
+
+          <!-- ALPHA 2 -->
+          <div style="color:var(--charcoal);">Alpha-2</div>
+          <div style="background:var(--parchment); border-radius:99px; height:10px; position:relative; overflow:hidden;">
+            <div style="position:absolute; left:0; top:0; height:100%; width:12.4%; background:var(--sage); border-radius:99px; opacity:0.7;"></div>
+            <div style="position:absolute; left:8.9%; top:0; height:100%; width:6%; background:rgba(122,158,138,0.3); border-radius:0;"></div>
+          </div>
+          <div style="text-align:right; color:var(--sage-deep);">12.4%</div>
+          <div style="text-align:right; color:var(--stone);">0.9</div>
+
+          <!-- BETA -->
+          <div style="color:var(--charcoal);">Beta</div>
+          <div style="background:var(--parchment); border-radius:99px; height:10px; position:relative; overflow:hidden;">
+            <div style="position:absolute; left:0; top:0; height:100%; width:14.3%; background:var(--amber); border-radius:99px; opacity:0.7;"></div>
+            <div style="position:absolute; left:10.8%; top:0; height:100%; width:5.4%; background:rgba(196,170,128,0.3); border-radius:0;"></div>
+          </div>
+          <div style="text-align:right; color:#9E8050;">14.3%</div>
+          <div style="text-align:right; color:var(--stone);">1.0</div>
+
+          <!-- GAMMA -->
+          <div style="color:var(--charcoal);">Gamma</div>
+          <div style="background:var(--parchment); border-radius:99px; height:10px; position:relative; overflow:hidden;">
+            <div style="position:absolute; left:0; top:0; height:100%; width:15%; background:var(--lavender); border-radius:99px; opacity:0.7;"></div>
+            <div style="position:absolute; left:9.8%; top:0; height:100%; width:14.6%; background:rgba(168,155,181,0.3); border-radius:0;"></div>
+          </div>
+          <div style="text-align:right; color:var(--lavender);">15.0%</div>
+          <div style="text-align:right; color:var(--stone);">1.1</div>
+
+        </div>
+        <div style="font-size:0.7rem; color:var(--stone); margin-top:0.8rem;">▪ 實色條 = 實測值　▪ 淡色區 = 正常參考範圍</div>
+      </div>
+
+      <!-- 詳細數字表 -->
+      <table>
+        <thead>
+          <tr><th>分區</th><th>實測 %</th><th>參考範圍 %</th><th>g/dL</th><th>狀態</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Albumin 白蛋白</td>
+            <td class="val-ok">55.0</td><td>47.0–61.6</td><td>3.9</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr>
+            <td>Alpha-1</td>
+            <td class="val-ok">3.3</td><td>2.0–4.4</td><td>0.2</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr>
+            <td>Alpha-2</td>
+            <td class="val-ok">12.4</td><td>8.9–14.9</td><td>0.9</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr>
+            <td>Beta</td>
+            <td class="val-ok">14.3</td><td>10.8–16.2</td><td>1.0</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr>
+            <td>Gamma</td>
+            <td class="val-ok">15.0</td><td>9.8–24.4</td><td>1.1</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr style="border-top:2px solid var(--taupe);">
+            <td style="font-weight:400; color:var(--charcoal);">Total 總蛋白</td>
+            <td colspan="2">—</td><td style="font-weight:400; color:var(--charcoal);">7.1</td><td><span class="tag-ok">正常</span></td>
+          </tr>
+          <tr>
+            <td>A/G Ratio</td>
+            <td colspan="2">—</td><td class="val-ok">1.2</td>
+            <td><span class="tag-ok">正常</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 臨床意義說明 -->
+      <div style="margin-top:1.2rem; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;">
+        <div style="font-size:0.78rem; color:var(--stone); padding:0.8rem 1rem; background:var(--cream); border-radius:8px; line-height:1.7;">
+          <strong style="color:var(--charcoal); display:block; margin-bottom:0.3rem;">📋 此項檢查的目的</strong>
+          血清蛋白電泳用於篩查<strong style="color:var(--charcoal);">多發性骨髓瘤、華氏巨球蛋白血症</strong>等漿細胞疾病。結合嗜酸性白血球偏高的背景，此次檢查排除了免疫球蛋白異常增生的可能性。
+        </div>
+        <div style="font-size:0.78rem; color:var(--stone); padding:0.8rem 1rem; background:rgba(122,158,138,0.07); border:1px solid rgba(122,158,138,0.2); border-radius:8px; line-height:1.7;">
+          <strong style="color:var(--sage-deep); display:block; margin-bottom:0.3rem;">✅ 結果解讀</strong>
+          五個分區均在正常範圍內，無 M 蛋白峰（paraprotein），免疫固定電泳（IFE）六道陰性。Alpha-2 球蛋白（12.4%）略靠近上限，可能反映<strong style="color:var(--charcoal);">慢性發炎或腎病狀態</strong>，與 eGFR 偏低一致，屬預期內表現。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ 保健攝取 ══════ -->
+  <section class="section" id="supp">
+    <div class="section-label">Supplement Guide</div>
+    <div class="section-title">保健食品攝取建議</div>
+
+    <div class="protein-box">
+      <div class="protein-col">
+        <h4>每日蛋白質攝取目標</h4>
+        <div class="protein-row">正常人<span>0.8–1.0 g / 公斤體重</span></div>
+        <div class="protein-row" style="color:var(--rose-deep); font-weight:400">CKD G3（您的狀況）<span style="color:var(--rose-deep)">0.6–0.8 g / 公斤體重</span></div>
+        <div class="protein-row">蛋白尿明顯期<span>由營養師精算</span></div>
+        <div style="font-size:0.75rem; color:var(--stone); margin-top:1rem; padding: 0.7rem; background:var(--cream); border-radius:8px;">
+          選高品質蛋白：蛋 · 魚 · 雞胸肉<br>避免大量攝取乳清蛋白粉
+        </div>
+      </div>
+      <div class="protein-col">
+        <h4>最需優先改善的指標</h4>
+        <div class="protein-row">Homocysteine 25.3<span style="color:var(--warn-red)">補葉酸＋B群</span></div>
+        <div class="protein-row">eGFR 持續偏低<span style="color:var(--warn-red)">減少腎臟負擔</span></div>
+        <div class="protein-row">LDL 偏高 / HDL 偏低<span style="color:var(--warn-yellow)">Omega-3魚油</span></div>
+        <div class="protein-row">血糖邊緣值<span style="color:var(--warn-yellow)">飲食控制</span></div>
+      </div>
+    </div>
+
+    <div class="supp-grid">
+      <div class="supp-card c1">
+        <div class="supp-icon">🧬</div>
+        <div class="supp-name">葉酸 ＋ 維生素 B6 · B12</div>
+        <div class="supp-dose">葉酸 800mcg ／ B12 1000mcg · 每日</div>
+        <div class="supp-reason">Homocysteine 偏高（25.3 umol/L）首要補充目標。葉酸與B群是代謝 Homocysteine 的必需輔酶，補充後可減少腎臟血管內皮損傷。</div>
+        <span class="supp-target">針對：Homocysteine ↑ 心血管保護</span>
+      </div>
+      <div class="supp-card c2">
+        <div class="supp-icon">🐟</div>
+        <div class="supp-name">Omega-3 深海魚油</div>
+        <div class="supp-dose">EPA＋DHA 合計 2–4g · 每日</div>
+        <div class="supp-reason">降低腎臟發炎反應，有研究顯示可減少蛋白尿。同時改善 LDL 偏高、HDL 偏低的血脂問題，一舉兩得。</div>
+        <span class="supp-target">針對：血脂 · 蛋白尿 · 腎臟發炎</span>
+      </div>
+      <div class="supp-card c3">
+        <div class="supp-icon">⚡</div>
+        <div class="supp-name">輔酶 Q10（CoQ10）</div>
+        <div class="supp-dose">100–200mg · 每日</div>
+        <div class="supp-reason">強效抗氧化劑，保護腎臟細胞粒線體功能。腎功能不全患者體內 CoQ10 偏低，補充有助延緩腎臟細胞老化。</div>
+        <span class="supp-target">針對：腎細胞保護 · 抗氧化</span>
+      </div>
+      <div class="supp-card c4">
+        <div class="supp-icon">🌿</div>
+        <div class="supp-name">薑黃素（Curcumin）</div>
+        <div class="supp-dose">高吸收劑型（含 Piperine）</div>
+        <div class="supp-reason">抗發炎、抑制腎臟纖維化。需選擇添加胡椒鹼（Piperine）的高吸收劑型，否則薑黃素吸收率極低。</div>
+        <span class="supp-target">針對：腎臟纖維化抑制 · 發炎</span>
+      </div>
+      <div class="supp-card c5">
+        <div class="supp-icon">☀️</div>
+        <div class="supp-name">維生素 D3</div>
+        <div class="supp-dose">維持現狀（目前已充足）</div>
+        <div class="supp-reason">目前 25-OH Vit D = 43.4 ng/mL，已在充足範圍（30–100）。維生素D有助抑制腎臟纖維化，維持現況即可，無需額外大量補充。</div>
+        <span class="supp-target">✅ PTH 已從 82.9 降至 50.9</span>
+      </div>
+      <div class="supp-card c6">
+        <div class="supp-icon">🌾</div>
+        <div class="supp-name">飲食蛋白質控制</div>
+        <div class="supp-dose">0.6–0.8 g / 公斤體重 · 每日</div>
+        <div class="supp-reason">非補充品，但是最重要的「腎臟保護行動」。蛋白質過量直接增加腎絲球過濾壓力，建議諮詢腎臟專科營養師。</div>
+        <span class="supp-target">最高優先：減少腎臟負擔</span>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-bottom:0.8rem">Avoid List</div>
+    <div style="font-size:0.85rem; color:var(--stone); margin-bottom:1.2rem">以下補充品腎功能不佳時應避免或謹慎使用</div>
+    <div class="avoid-grid">
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">高劑量蛋白粉 · 乳清蛋白</div>
+          <div class="avoid-why">直接增加腎絲球過濾壓力，加速腎功能惡化</div>
+        </div>
+      </div>
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">高劑量維生素 C（每日 &gt;500mg）</div>
+          <div class="avoid-why">代謝產物草酸鹽會在腎臟結晶沉積</div>
+        </div>
+      </div>
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">草藥類「補腎」產品</div>
+          <div class="avoid-why">部分含馬兜鈴酸，具強烈腎毒性（台灣曾有案例）</div>
+        </div>
+      </div>
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">高鉀補充品 · 大量香蕉 · 堅果</div>
+          <div class="avoid-why">eGFR 低時鉀離子排出減慢，易引發高血鉀危險</div>
+        </div>
+      </div>
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">高劑量維生素 A</div>
+          <div class="avoid-why">腎病患者代謝速度慢，長期服用易累積中毒</div>
+        </div>
+      </div>
+      <div class="avoid-item">
+        <div class="avoid-x">✕</div>
+        <div>
+          <div class="avoid-name">高磷食品補充劑 · 含磷防腐劑加工食品</div>
+          <div class="avoid-why">目前磷指標正常，仍需留意避免磷蓄積</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-bottom:0.8rem">Priority Action</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">控制每日蛋白質攝取量 <span class="step-tag">最高優先</span></div>
+          <div class="step-desc">諮詢腎臟科或腎臟營養師，依體重精算每日蛋白質上限（0.6–0.8g/kg）。這是延緩腎功能惡化最有效的單一行動。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">補充葉酸 800mcg ＋ B12 1000mcg <span class="step-tag">急迫</span></div>
+          <div class="step-desc">針對 Homocysteine 25.3 umol/L 偏高，這是目前最新報告唯一異常值，同時也是腎臟微血管損傷的重要風險因子。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">開始 Omega-3 魚油（2–4g EPA+DHA／天）</div>
+          <div class="step-desc">同時改善血脂（LDL↑、HDL↓）與腎臟發炎，一舉兩得。選擇高純度魚油，避免含汞或低品質來源。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">加入 CoQ10 100–200mg／天</div>
+          <div class="step-desc">保護腎臟細胞粒線體功能，抗氧化。建議與含油脂餐食一起服用以提高吸收率。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">定期追蹤 eGFR · BUN · 尿蛋白 · Homocysteine <span class="step-tag">每 1–3 個月</span></div>
+          <div class="step-desc">eGFR 最新值 49.77 已較 9 月最高點（55.63）下降，趨勢值得警惕。建議攜帶此份分析報告至腎臟科門診討論。</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background: rgba(90,82,80,0.05); border: 1px solid var(--taupe); border-radius:12px; padding:1.4rem 1.8rem; font-size:0.78rem; color:var(--stone); line-height:1.8; margin-top:1rem;">
+      ⚠️ 本頁保健建議為參考用途，所有補充品的劑量與種類請在開始前告知腎臟科醫師確認。部分補充品在腎功能不佳時需要調整劑量，切勿自行大量服用。
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>呂昇鴻</strong> 健康管理儀表板 · 資料來源：健檢Excel（114/07–12）＋ 聯合醫事檢驗所（2026/03/26）<br>
+  本報告僅供個人健康追蹤參考，不構成醫療診斷。請以主治醫師評估為準。
+</footer>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelector(`#${id}`).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
