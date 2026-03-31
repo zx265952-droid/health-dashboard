@@ -3,686 +3,739 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>健康指標追蹤｜呂昇鴻</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>呂昇鴻 · 健康管理儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:#f2ede8; --bg2:#ebe5de; --card:#f8f4f0;
-    --border:#d9cfc7; --border2:#c8bdb4;
-    --text:#4a4240; --muted:#8c7f7a; --soft:#b5a89f;
-    --accent:#8fa3a8; --accent2:#a8967e;
-    --danger:#b07070; --warn:#b09070; --ok:#7a9e8a; --ok2:#6d8f8a;
-    --shadow:rgba(74,66,64,0.08);
+    --cream:#F0EBE3; --parchment:#E8E0D5; --taupe:#C4B8AC; --stone:#9E9088;
+    --charcoal:#5A5250; --deep:#3D3533;
+    --rose:#C4A09B; --rose-light:#DDC5C0; --rose-deep:#A67F7A;
+    --sage:#8FA898; --sage-light:#BDD0C4; --sage-deep:#6B8A78;
+    --blue:#8097AA; --blue-light:#B5C7D4; --blue-deep:#5D7A90;
+    --lavender:#A89BB5; --lavender-light:#CABDD6;
+    --amber:#C4AA80; --amber-light:#DDD0B0;
+    --warn-red:#C07070; --warn-yellow:#C4AA60; --ok-green:#7A9E8A;
   }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;}
-
-  /* Header */
-  .header{background:var(--card);border-bottom:1px solid var(--border);padding:24px 36px 18px;position:sticky;top:0;z-index:200;}
-  .header-inner{max-width:920px;margin:0 auto;}
-  .header-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px;}
-  .patient-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:500;}
-  .patient-name{font-family:'Noto Serif TC',serif;font-size:22px;font-weight:600;}
-  .patient-meta{font-size:12px;color:var(--muted);margin-top:3px;}
-  .header-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .btn{padding:7px 16px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-  .btn:hover{background:var(--bg2);color:var(--text);}
-  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
-  .btn-primary:hover{background:var(--ok2);border-color:var(--ok2);}
-  .filter-tabs{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
-  .tab{padding:4px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-
-  /* Category tabs */
-  .cat-tabs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
-  .cat-tab{padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
-  .cat-tab.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
-
-  /* Main */
-  .main{max-width:920px;margin:0 auto;padding:24px 20px 60px;}
-  .alert-banner{background:#f0e8e8;border:1px solid #d4b5b5;border-left:4px solid var(--danger);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--danger);}
-  .alert-banner.hidden{display:none;}
-
-  /* Card */
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);transition:box-shadow .2s;}
-  .card:hover{box-shadow:0 4px 16px var(--shadow);}
-  .card.abnormal{border-color:#d4b5b5;box-shadow:0 2px 12px rgba(176,112,112,.1);}
-  .card-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-  .card-title-row{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;}
-  .card-title{font-size:15px;font-weight:600;}
-  .card-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg2);color:var(--muted);border:1px solid var(--border);font-weight:500;}
-  .card-key{font-size:10px;color:var(--soft);font-family:monospace;}
-  .card-right{text-align:right;}
-  .card-value{font-family:'Noto Serif TC',serif;font-size:26px;font-weight:700;line-height:1;}
-  .card-unit{font-size:12px;font-weight:400;color:var(--muted);margin-left:3px;}
-  .badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;margin-top:5px;}
-  .badge-danger{background:rgba(176,112,112,.15);color:var(--danger);border:1px solid rgba(176,112,112,.3);}
-  .badge-ok{background:rgba(122,158,138,.15);color:var(--ok);border:1px solid rgba(122,158,138,.3);}
-  .badge-warn{background:rgba(176,144,112,.15);color:var(--warn);border:1px solid rgba(176,144,112,.3);}
-  .card-ref{font-size:11px;color:var(--muted);margin-bottom:8px;}
-  .range-bar-bg{height:4px;background:var(--bg2);border-radius:10px;position:relative;margin-bottom:14px;overflow:visible;}
-  .range-bar-ok{position:absolute;height:100%;background:rgba(122,158,138,.2);border-radius:10px;left:0;width:100%;}
-  .range-bar-dot{position:absolute;width:10px;height:10px;border-radius:50%;top:-3px;transform:translateX(-50%);border:2px solid #fff;box-shadow:0 1px 4px var(--shadow);}
-  .chart-wrap{height:100px;margin-bottom:7px;}
-  .chart-legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:10px;color:var(--muted);margin-bottom:10px;padding:4px 8px;background:var(--bg2);border-radius:7px;}
-  .chart-legend-item{display:flex;align-items:center;gap:4px;}
-  .legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .legend-dash{width:14px;height:0;border-top:2px dashed;flex-shrink:0;}
-  .history-toggle{font-size:12px;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:5px;user-select:none;padding:2px 0;}
-  .history-toggle:hover{color:var(--ok2);}
-  .history-table-wrap{display:none;margin-top:8px;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
-  .history-table-wrap.open{display:block;}
-  .history-table{width:100%;border-collapse:collapse;font-size:12px;}
-  .history-table th{text-align:left;padding:7px 10px;color:var(--muted);background:var(--bg2);font-weight:500;white-space:nowrap;border-bottom:1px solid var(--border);}
-  .history-table td{padding:6px 10px;border-bottom:1px solid var(--bg2);color:var(--text);white-space:nowrap;}
-  .history-table tr:last-child td{border-bottom:none;}
-  .history-table .latest-row{background:rgba(143,163,168,.07);}
-  .history-table .latest-row td{font-weight:600;}
-  .trend-up{color:var(--danger);}.trend-down{color:var(--ok);}.trend-flat{color:var(--muted);}
-  hr.divider{border:none;border-top:1px dashed var(--border);margin:12px 0;}
-  .meaning-toggle{font-size:12px;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:5px;user-select:none;}
-  .meaning-toggle:hover{color:var(--ok2);}
-  .meaning-box{margin-top:9px;padding:12px 15px;background:rgba(143,163,168,.1);border-left:3px solid var(--accent);border-radius:0 9px 9px 0;font-size:13px;color:var(--text);line-height:1.8;display:none;}
-  .meaning-box.open{display:block;}
-  .no-history{font-size:11px;color:var(--soft);margin-top:4px;}
-
-  /* Modal */
-  .overlay{position:fixed;inset:0;background:rgba(74,66,64,.55);display:none;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px);}
-  .overlay.open{display:flex;}
-  .modal{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:30px;width:min(600px,95vw);max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(74,66,64,.18);}
-  .modal-title{font-family:'Noto Serif TC',serif;font-size:19px;font-weight:600;margin-bottom:4px;}
-  .modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
-  .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
-  .field-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
-  .field-input{width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:'Noto Sans TC',sans-serif;transition:border-color .2s;}
-  .field-input:focus{border-color:var(--accent);}
-  .date-field{grid-column:1/-1;}
-  .modal-btns{display:flex;gap:10px;}
-  .modal-save{flex:1;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:background .2s;}
-  .modal-save:hover{background:var(--ok2);}
-  .modal-cancel{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
-  .section-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--soft);font-weight:600;margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-  .footer{text-align:center;font-size:11px;color:var(--soft);margin-top:36px;line-height:2;}
-  @media(max-width:540px){.header{padding:16px 12px 14px;}.main{padding:16px 10px 60px;}.card{padding:14px 12px;}.card-value{font-size:22px;}.modal-grid{grid-template-columns:1fr;}}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Noto Serif TC',serif;background:var(--cream);color:var(--deep);line-height:1.7;font-weight:300;}
+  header{background:var(--charcoal);color:var(--parchment);padding:3rem 4rem;position:relative;overflow:hidden;}
+  header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(196,160,155,0.15);}
+  header::after{content:'';position:absolute;bottom:-40px;left:20%;width:200px;height:200px;border-radius:50%;background:rgba(143,168,152,0.12);}
+  .header-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end;}
+  .header-title{font-family:'Cormorant Garamond',serif;font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;color:var(--taupe);margin-bottom:.5rem;}
+  .header-name{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;letter-spacing:.05em;line-height:1;}
+  .header-name span{font-style:italic;color:var(--rose-light);}
+  .header-meta{text-align:right;font-size:.8rem;color:var(--taupe);line-height:1.9;}
+  .header-meta strong{color:var(--parchment);font-weight:400;}
+  nav{background:var(--parchment);border-bottom:1px solid var(--taupe);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+  .nav-inner{max-width:1100px;margin:0 auto;display:flex;}
+  .nav-tab{padding:.9rem 1.4rem;font-size:.76rem;letter-spacing:.08em;cursor:pointer;border-bottom:3px solid transparent;transition:all .25s;color:var(--stone);user-select:none;white-space:nowrap;}
+  .nav-tab:hover{color:var(--charcoal);}
+  .nav-tab.active{color:var(--charcoal);border-bottom-color:var(--rose);background:rgba(196,160,155,.08);}
+  main{max-width:1100px;margin:0 auto;padding:3rem 2rem 5rem;}
+  .section{display:none;}
+  .section.active{display:block;}
+  .section-label{font-family:'Cormorant Garamond',serif;font-size:.7rem;letter-spacing:.4em;text-transform:uppercase;color:var(--stone);margin-bottom:.4rem;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--charcoal);margin-bottom:2.5rem;padding-bottom:1rem;border-bottom:1px solid var(--taupe);}
+  .overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:3rem;}
+  .ov-card{background:white;border-radius:12px;padding:1.5rem;border:1px solid var(--parchment);position:relative;overflow:hidden;}
+  .ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:12px 12px 0 0;}
+  .ov-card.rose::before{background:var(--rose);}
+  .ov-card.sage::before{background:var(--sage);}
+  .ov-card.blue::before{background:var(--blue);}
+  .ov-card.amber::before{background:var(--amber);}
+  .ov-label{font-size:.75rem;color:var(--stone);letter-spacing:.05em;margin-bottom:.4rem;}
+  .ov-value{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;line-height:1;}
+  .ov-card.rose .ov-value{color:var(--rose-deep);}
+  .ov-card.sage .ov-value{color:var(--sage-deep);}
+  .ov-card.blue .ov-value{color:var(--blue-deep);}
+  .ov-card.amber .ov-value{color:#9E8050;}
+  .ov-sub{font-size:.72rem;color:var(--stone);margin-top:.3rem;}
+  .alert-section{background:white;border-radius:14px;padding:2rem;margin-bottom:3rem;border:1px solid var(--parchment);}
+  .alert-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem;}
+  .alert-dot{width:10px;height:10px;border-radius:50%;background:var(--warn-red);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.3);}}
+  .alert-title{font-size:.85rem;letter-spacing:.1em;color:var(--charcoal);}
+  .abnormal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+  .abn-item{background:var(--cream);border-radius:10px;padding:1.2rem 1.4rem;border-left:4px solid var(--warn-red);}
+  .abn-item.warn{border-left-color:var(--warn-yellow);}
+  .abn-item.info{border-left-color:var(--blue);}
+  .abn-item.ok{border-left-color:var(--ok-green);}
+  .abn-name{font-size:.78rem;color:var(--stone);margin-bottom:.3rem;}
+  .abn-value{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--charcoal);}
+  .abn-range{font-size:.7rem;color:var(--stone);margin-top:.2rem;}
+  .abn-badge{display:inline-block;font-size:.62rem;padding:.15rem .5rem;border-radius:20px;margin-top:.4rem;}
+  .badge-high{background:rgba(192,112,112,.15);color:var(--warn-red);}
+  .badge-low{background:rgba(122,158,138,.15);color:var(--ok-green);}
+  .badge-critical{background:rgba(192,112,112,.25);color:#9E4040;}
+  .data-group{background:white;border-radius:14px;padding:2rem;margin-bottom:2rem;border:1px solid var(--parchment);}
+  .data-group-title{font-size:.82rem;letter-spacing:.1em;color:var(--charcoal);margin-bottom:.5rem;font-weight:400;display:flex;align-items:center;gap:.6rem;}
+  .data-group-title::before{content:'';width:20px;height:2px;background:var(--taupe);display:inline-block;flex-shrink:0;}
+  .clinical-note{font-size:.75rem;color:var(--stone);line-height:1.75;padding:.8rem 1.1rem;background:var(--cream);border-radius:8px;margin-bottom:1.4rem;border-left:3px solid var(--taupe);}
+  .clinical-note strong{color:var(--charcoal);}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  thead th{font-weight:400;font-size:.72rem;letter-spacing:.1em;color:var(--stone);text-align:left;padding:.6rem 1rem;border-bottom:2px solid var(--parchment);}
+  tbody tr:hover{background:var(--cream);}
+  tbody td{padding:.65rem 1rem;border-bottom:1px solid var(--parchment);color:var(--charcoal);vertical-align:middle;}
+  tbody td:first-child{color:var(--stone);font-size:.78rem;}
+  .val-high{color:var(--warn-red);font-weight:400;}
+  .val-low{color:var(--blue-deep);font-weight:400;}
+  .val-ok{color:var(--sage-deep);}
+  .tag-high,.tag-low,.tag-ok{display:inline-block;font-size:.62rem;padding:.1rem .5rem;border-radius:20px;margin-left:.4rem;}
+  .tag-high{background:rgba(192,112,112,.15);color:var(--warn-red);}
+  .tag-low{background:rgba(125,157,181,.15);color:var(--blue-deep);}
+  .tag-ok{background:rgba(122,158,138,.15);color:var(--sage-deep);}
+  .trend-section{background:white;border-radius:14px;padding:2rem;margin-bottom:2rem;border:1px solid var(--parchment);}
+  .trend-item{margin-bottom:1.5rem;}
+  .trend-meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--stone);margin-bottom:.4rem;}
+  .trend-name{color:var(--charcoal);font-weight:400;}
+  .trend-dates{display:flex;gap:.8rem;margin-top:.4rem;flex-wrap:wrap;}
+  .trend-point{font-size:.7rem;color:var(--stone);background:var(--cream);padding:.15rem .6rem;border-radius:20px;border:1px solid var(--parchment);}
+  .trend-point.high{color:var(--warn-red);border-color:rgba(192,112,112,.3);background:rgba(192,112,112,.06);}
+  /* SUPPLEMENT */
+  .supp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;margin-bottom:2.5rem;}
+  .supp-card{background:white;border-radius:14px;padding:1.8rem;border:1px solid var(--parchment);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+  .supp-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.08);}
+  .supp-card::after{content:'';position:absolute;bottom:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.08;}
+  .supp-card.c1::after{background:var(--blue);}
+  .supp-card.c2::after{background:var(--sage);}
+  .supp-card.c3::after{background:var(--rose);}
+  .supp-card.c4::after{background:var(--lavender);}
+  .supp-card.c5::after{background:var(--amber);}
+  .supp-card.c6::after{background:var(--taupe);}
+  .supp-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem;}
+  .supp-card.c1 .supp-icon{background:rgba(128,151,170,.15);}
+  .supp-card.c2 .supp-icon{background:rgba(143,168,152,.15);}
+  .supp-card.c3 .supp-icon{background:rgba(196,160,155,.15);}
+  .supp-card.c4 .supp-icon{background:rgba(168,155,181,.15);}
+  .supp-card.c5 .supp-icon{background:rgba(196,170,128,.15);}
+  .supp-card.c6 .supp-icon{background:rgba(196,184,172,.15);}
+  .supp-name{font-size:.95rem;color:var(--charcoal);font-weight:400;margin-bottom:.3rem;}
+  .supp-dose{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--stone);margin-bottom:.8rem;}
+  .supp-reason{font-size:.78rem;color:var(--stone);line-height:1.6;}
+  .supp-target{display:inline-block;font-size:.68rem;padding:.2rem .6rem;border-radius:20px;background:var(--cream);color:var(--charcoal);border:1px solid var(--parchment);margin-top:.8rem;}
+  .avoid-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem;}
+  .avoid-item{background:white;border-radius:10px;padding:1.2rem 1.4rem;border:1px solid var(--parchment);display:flex;align-items:flex-start;gap:1rem;}
+  .avoid-x{width:28px;height:28px;background:rgba(192,112,112,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--warn-red);flex-shrink:0;margin-top:.1rem;}
+  .avoid-name{font-size:.85rem;color:var(--charcoal);margin-bottom:.2rem;font-weight:400;}
+  .avoid-why{font-size:.75rem;color:var(--stone);}
+  .steps{display:flex;flex-direction:column;gap:1rem;margin-bottom:2.5rem;}
+  .step{background:white;border-radius:12px;padding:1.4rem 1.6rem;border:1px solid var(--parchment);display:flex;align-items:flex-start;gap:1.2rem;}
+  .step-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;line-height:1;color:var(--taupe);min-width:32px;}
+  .step-content{flex:1;}
+  .step-title{font-size:.88rem;color:var(--charcoal);font-weight:400;margin-bottom:.2rem;}
+  .step-desc{font-size:.78rem;color:var(--stone);line-height:1.6;}
+  .step-tag{font-size:.65rem;padding:.15rem .5rem;border-radius:20px;border:1px solid var(--taupe);color:var(--stone);margin-left:.5rem;}
+  .protein-box{background:white;border-radius:14px;padding:2rem;margin-bottom:2rem;border:1px solid var(--parchment);display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+  .protein-col h4{font-size:.78rem;letter-spacing:.1em;color:var(--stone);margin-bottom:1rem;text-transform:uppercase;}
+  .protein-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--parchment);font-size:.82rem;color:var(--charcoal);}
+  .protein-row span{color:var(--stone);font-size:.78rem;}
+  /* ── 指標解讀 ── */
+  .interp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem;margin-bottom:2.5rem;}
+  .interp-card{background:white;border-radius:14px;padding:1.8rem;border:1px solid var(--parchment);}
+  .ic-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.9rem;}
+  .ic-name{font-size:.88rem;color:var(--charcoal);font-weight:400;}
+  .ic-date{font-size:.68rem;color:var(--stone);margin-top:.15rem;}
+  .ic-val{font-family:'Cormorant Garamond',serif;font-size:1.7rem;line-height:1;text-align:right;}
+  .ic-val.high{color:var(--warn-red);}
+  .ic-val.warn{color:#9E8050;}
+  .ic-val.low{color:var(--blue-deep);}
+  .ic-val.ok{color:var(--sage-deep);}
+  .ic-range{font-size:.66rem;background:var(--cream);padding:.2rem .6rem;border-radius:20px;color:var(--stone);white-space:nowrap;text-align:right;margin-top:.2rem;}
+  .ic-meaning{font-size:.77rem;color:var(--stone);line-height:1.78;margin-bottom:.9rem;}
+  .ic-meaning strong{color:var(--charcoal);}
+  .ic-links{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .ic-link{font-size:.67rem;padding:.2rem .65rem;border-radius:20px;border:1px solid var(--parchment);}
+  .ic-link.rel-high{background:rgba(192,112,112,.08);color:var(--rose-deep);border-color:rgba(192,112,112,.2);}
+  .ic-link.rel-warn{background:rgba(196,170,128,.12);color:#9E8050;border-color:rgba(196,170,128,.3);}
+  .ic-link.rel-ok{background:rgba(122,158,138,.1);color:var(--sage-deep);border-color:rgba(122,158,138,.25);}
+  .ic-link.rel-info{background:rgba(128,151,170,.1);color:var(--blue-deep);border-color:rgba(128,151,170,.25);}
+  /* ── 關係鏈 ── */
+  .chain-section{background:white;border-radius:14px;padding:2rem;margin-bottom:2rem;border:1px solid var(--parchment);}
+  .chain-title{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);margin-bottom:1.6rem;display:flex;align-items:center;gap:.6rem;}
+  .chain-title::before{content:'';width:20px;height:2px;background:var(--taupe);display:inline-block;}
+  .chain{display:flex;align-items:center;flex-wrap:wrap;gap:.3rem;margin-bottom:.6rem;padding:1rem 1.2rem;background:var(--cream);border-radius:10px;}
+  .chain-node{font-size:.76rem;padding:.3rem .8rem;border-radius:8px;font-weight:400;white-space:nowrap;}
+  .cn-bad{background:rgba(192,112,112,.15);color:var(--warn-red);border:1px solid rgba(192,112,112,.2);}
+  .cn-warn{background:rgba(196,170,128,.15);color:#9E8050;border:1px solid rgba(196,170,128,.2);}
+  .cn-ok{background:rgba(122,158,138,.12);color:var(--sage-deep);border:1px solid rgba(122,158,138,.2);}
+  .cn-neutral{background:var(--parchment);color:var(--charcoal);border:1px solid var(--taupe);}
+  .chain-arrow{color:var(--taupe);font-size:.9rem;}
+  .chain-label{font-size:.72rem;color:var(--stone);margin-bottom:1.2rem;padding-left:1.2rem;line-height:1.6;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .section.active>*{animation:fadeUp .4s ease both;}
+  .section.active>*:nth-child(2){animation-delay:.06s;}
+  .section.active>*:nth-child(3){animation-delay:.12s;}
+  .section.active>*:nth-child(4){animation-delay:.18s;}
+  .section.active>*:nth-child(5){animation-delay:.24s;}
+  .section.active>*:nth-child(6){animation-delay:.3s;}
+  .section.active>*:nth-child(7){animation-delay:.36s;}
+  .section.active>*:nth-child(8){animation-delay:.42s;}
+  footer{background:var(--charcoal);color:var(--stone);text-align:center;padding:2rem;font-size:.75rem;letter-spacing:.05em;}
+  footer strong{color:var(--taupe);}
+  @media(max-width:768px){
+    .overview-grid,.abnormal-grid,.supp-grid,.avoid-grid,.protein-box,.interp-grid{grid-template-columns:1fr;}
+    .header-inner{flex-direction:column;gap:1.5rem;}
+    .header-meta{text-align:left;}
+    header{padding:2rem;}
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
+<header>
   <div class="header-inner">
-    <div class="header-top">
+    <div>
+      <div class="header-title">Personal Health Dashboard</div>
+      <div class="header-name">呂昇鴻 <span>健康管理</span></div>
+    </div>
+    <div class="header-meta">
+      <div>性別 <strong>男</strong>　年齡 <strong>60 歲</strong></div>
+      <div>資料期間 <strong>114/07 — 115/03</strong></div>
+      <div>資料來源 <strong>健檢Excel ＋ 聯合醫事檢驗所 ＋ 血清蛋白電泳</strong></div>
+      <div style="margin-top:.5rem;color:var(--rose-light)">最新採檢 2026/03/26–28</div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-tab active" onclick="switchTab('overview',this)">總覽</div>
+    <div class="nav-tab" onclick="switchTab('kidney',this)">腎功能</div>
+    <div class="nav-tab" onclick="switchTab('blood',this)">血脂 · 血糖</div>
+    <div class="nav-tab" onclick="switchTab('lab',this)">最新報告</div>
+    <div class="nav-tab" onclick="switchTab('interp',this)">📊 指標交叉解讀</div>
+    <div class="nav-tab" onclick="switchTab('supp',this)">保健攝取</div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══════ 總覽 ══════ -->
+<section class="section active" id="overview">
+  <div class="section-label">Overview</div>
+  <div class="section-title">健康狀態總覽</div>
+  <div class="overview-grid">
+    <div class="ov-card rose">
+      <div class="ov-label">腎絲球過濾率 eGFR</div>
+      <div class="ov-value">49.77</div>
+      <div class="ov-sub">ml/min/1.73m² · 114/12/22</div>
+      <div class="ov-sub" style="color:var(--warn-red);margin-top:.4rem">CKD 第 3a 期 · 半年持續偏低</div>
+    </div>
+    <div class="ov-card sage">
+      <div class="ov-label">Homocysteine 同半胱胺酸</div>
+      <div class="ov-value">25.3</div>
+      <div class="ov-sub">umol/L · 2026/03/26</div>
+      <div class="ov-sub" style="color:var(--warn-red);margin-top:.4rem">偏高 H · 心血管＋腎臟雙重風險</div>
+    </div>
+    <div class="ov-card blue">
+      <div class="ov-label">24小時尿蛋白（最新）</div>
+      <div class="ov-value">109.2</div>
+      <div class="ov-sub">MG/Day · 114/12/22</div>
+      <div class="ov-sub" style="color:var(--ok-green);margin-top:.4rem">↓ 較8月248.1 顯著改善</div>
+    </div>
+    <div class="ov-card amber">
+      <div class="ov-label">血中尿素氮 BUN</div>
+      <div class="ov-value">27.8</div>
+      <div class="ov-sub">MG/DL · 114/12/22</div>
+      <div class="ov-sub" style="color:var(--warn-red);margin-top:.4rem">持續上升趨勢（正常 5–20）</div>
+    </div>
+  </div>
+  <div class="alert-section">
+    <div class="alert-header"><div class="alert-dot"></div><div class="alert-title">異常指標速覽 — 需持續追蹤</div></div>
+    <div class="abnormal-grid">
+      <div class="abn-item"><div class="abn-name">eGFR 腎絲球過濾率</div><div class="abn-value">49.77 <small style="font-size:.9rem;color:var(--stone)">ml/min</small></div><div class="abn-range">正常 ≥101 · 114/12/22</div><span class="abn-badge badge-critical">CKD G3a · 持續低於 60</span></div>
+      <div class="abn-item"><div class="abn-name">Homocysteine 同半胱胺酸</div><div class="abn-value">25.3 <small style="font-size:.9rem;color:var(--stone)">umol/L</small></div><div class="abn-range">正常 6.5–19.5 · 2026/03/26</div><span class="abn-badge badge-high">心血管 · 腎臟微血管風險</span></div>
+      <div class="abn-item"><div class="abn-name">血中尿素氮 BUN</div><div class="abn-value">27.8 <small style="font-size:.9rem;color:var(--stone)">MG/DL</small></div><div class="abn-range">正常 5–20 · 114/12 ↑持續升高</div><span class="abn-badge badge-high">上升趨勢</span></div>
+      <div class="abn-item warn"><div class="abn-name">M/C ratio 微白蛋白/肌酸酐</div><div class="abn-value">199.2 <small style="font-size:.9rem;color:var(--stone)">%</small></div><div class="abn-range">正常 0–30 · 114/08</div><span class="abn-badge badge-high">嚴重偏高</span></div>
+      <div class="abn-item warn"><div class="abn-name">LDL 低密度脂蛋白</div><div class="abn-value">163 <small style="font-size:.9rem;color:var(--stone)">MG/DL</small></div><div class="abn-range">正常 50–129 · 114/07</div><span class="abn-badge badge-high">偏高</span></div>
+      <div class="abn-item warn"><div class="abn-name">嗜酸性白血球計算</div><div class="abn-value">430–560</div><div class="abn-range">正常 50–350 · 114/10–12</div><span class="abn-badge badge-high">持續偏高 · 需釐清</span></div>
+      <div class="abn-item info"><div class="abn-name">飯前血糖 Glucose</div><div class="abn-value">102 <small style="font-size:.9rem;color:var(--stone)">MG/DL</small></div><div class="abn-range">正常 60–99 · 三次均同</div><span class="abn-badge" style="background:rgba(128,151,170,.15);color:var(--blue-deep)">糖尿病前期邊緣</span></div>
+      <div class="abn-item info"><div class="abn-name">HDL 高密度脂蛋白</div><div class="abn-value">35 <small style="font-size:.9rem;color:var(--stone)">MG/DL</small></div><div class="abn-range">正常 ≥40 · 114/07</div><span class="abn-badge badge-low">偏低</span></div>
+      <div class="abn-item ok"><div class="abn-name">24小時尿蛋白（最新）</div><div class="abn-value">109.2 <small style="font-size:.9rem;color:var(--stone)">MG/Day</small></div><div class="abn-range">正常 0–150 · 114/12 ✅</div><span class="abn-badge" style="background:rgba(122,158,138,.15);color:var(--ok-green)">↓ 回歸正常</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ 腎功能 ══════ -->
+<section class="section" id="kidney">
+  <div class="section-label">Kidney Function</div>
+  <div class="section-title">腎功能追蹤</div>
+
+  <div class="trend-section">
+    <div class="data-group-title">eGFR · BUN · CRE 時間軸趨勢</div>
+    <div class="clinical-note">
+      <strong>eGFR</strong> 反映腎臟每分鐘過濾血液量，是 CKD 分期核心指標。正常 ≥101；45–59 為第 3a 期，代表腎功能中度下降。本案半年全程低於 60，且最新值（49.77）較 9 月高點（55.63）下滑，下降趨勢需警惕。<br>
+      <strong>BUN（血中尿素氮）</strong>是蛋白質代謝廢物。從 114/07 邊緣值（20.9）逐步攀升至 114/12 的 27.8，與 eGFR 同步惡化，反映腎臟清廢能力持續下滑。<strong>BUN/CRE 比值 ≈ 17.6（正常 10–20）</strong>，排除上消化道出血或嚴重脫水。
+    </div>
+    <div class="trend-item">
+      <div class="trend-meta"><span class="trend-name">eGFR（正常 ≥101 ml/min）</span><span>CKD G3a 全程</span></div>
+      <div class="trend-dates">
+        <span class="trend-point high">114/07/03　49.76</span><span class="trend-point high">114/07/28　50.91</span><span class="trend-point high">114/08/22　54.94</span><span class="trend-point high">114/09/10　55.63 ←高點</span><span class="trend-point high">114/10/29　55.17</span><span class="trend-point high">114/12/22　49.77 ↓</span>
+      </div>
+    </div>
+    <div class="trend-item">
+      <div class="trend-meta"><span class="trend-name">血清肌酸酐 CRE（正常 0.6–1.5 mg/dL）</span></div>
+      <div class="trend-dates">
+        <span class="trend-point high">114/07/03　1.53</span><span class="trend-point">114/07/28　1.50</span><span class="trend-point">114/08/22　1.40</span><span class="trend-point">114/09/10　1.44</span><span class="trend-point">114/10/29　1.45</span><span class="trend-point high">114/12/22　1.58 ↑</span>
+      </div>
+    </div>
+    <div class="trend-item">
+      <div class="trend-meta"><span class="trend-name">血中尿素氮 BUN（正常 5–20 mg/dL）</span></div>
+      <div class="trend-dates">
+        <span class="trend-point high">114/07/28　20.9</span><span class="trend-point high">114/08/22　21.0</span><span class="trend-point high">114/09/10　22.9</span><span class="trend-point high">114/12/22　27.8 ↑</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">蛋白尿相關指標</div>
+    <div class="clinical-note">
+      <strong>微白蛋白</strong>是腎絲球損傷最早期訊號，正常 &lt;25 mg/L。114/07 高達 186.5 mg/L（正常值 7 倍），代表腎絲球屏障已嚴重破損。<strong>好消息：24 小時尿蛋白在 114/12 已回落至 109.2（正常範圍）</strong>，是目前所有指標中最重要的正向改善訊號。<br>
+      <strong>M/C ratio</strong>修正尿液濃度誤差後的白蛋白/肌酸酐比值，正常 &lt;30。114/07–08 的 224.7% 與 199.2% 均遠超正常，反映持續性蛋白尿，需繼續監測後續趨勢。
+    </div>
+    <table>
+      <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>114/07/03</td><td>微白蛋白</td><td class="val-high">186.5</td><td>MG/L</td><td>0–25</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+        <tr><td>114/08/22</td><td>微白蛋白</td><td class="val-high">77.9</td><td>MG/L</td><td>0–25</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/08/22</td><td>24小時尿蛋白</td><td class="val-high">248.1</td><td>MG/Day</td><td>0–150</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/12/22</td><td>24小時尿蛋白</td><td class="val-ok">109.2</td><td>MG/Day</td><td>0–150</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+        <tr><td>114/07/03</td><td>M/C ratio</td><td class="val-high">224.7</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+        <tr><td>114/08/22</td><td>M/C ratio</td><td class="val-high">199.2</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">副甲狀腺素 i-PTH · Vitamin D</div>
+    <div class="clinical-note">
+      <strong>PTH 偏高是 CKD 的典型繼發反應</strong>：腎功能下降 → 活性 VitD 合成不足 → 鈣吸收減少 → PTH 代償性升高（繼發性副甲狀腺亢進）。長期高 PTH 會造成骨質流失與血管鈣化。<br>
+      <strong>目前最佳改善案例</strong>：PTH 從 114/09 的 82.9（異常）→ 2026/03 的 50.9（正常），同期 Vitamin D 達 43.4 ng/mL（充足範圍），顯示維生素 D 補充策略直接有效，是目前所有指標中改善最成功的成果。
+    </div>
+    <table>
+      <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>114/09/10</td><td>i-PTH（Excel）</td><td class="val-high">82.9</td><td>pg/mL</td><td>15–68</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>2026/03/26</td><td>PTH-i（聯合醫事）</td><td class="val-ok">50.9</td><td>pg/mL</td><td>18.5–88.0</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+        <tr><td>2026/03/26</td><td>25-OH Vitamin D</td><td class="val-ok">43.4</td><td>ng/mL</td><td>充足 30–100</td><td><span class="tag-ok">充足</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════ 血脂血糖 ══════ -->
+<section class="section" id="blood">
+  <div class="section-label">Lipids &amp; Glucose</div>
+  <div class="section-title">血脂 · 血糖追蹤</div>
+
+  <div class="data-group">
+    <div class="data-group-title">血脂四項</div>
+    <div class="clinical-note">
+      <strong>LDL 163（偏高）＋ HDL 35（偏低）</strong>是心血管疾病最危險的血脂組合。高 LDL 在腎臟動脈內皮沉積形成粥狀斑塊，直接導致腎臟慢性缺血；HDL 偏低則喪失保護作用。<br>
+      <strong>CKD 患者 LDL 目標值</strong>應控制在 &lt;100 mg/dL（高風險族群甚至 &lt;70 mg/dL），目前 163 與目標差距顯著，建議與心臟科或腎臟科醫師討論是否需要降脂藥物介入。
+    </div>
+    <table>
+      <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>114/07/03</td><td>總膽固醇</td><td class="val-high">224</td><td>MG/DL</td><td>100–200</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/07/03</td><td>LDL 低密度脂蛋白</td><td class="val-high">163</td><td>MG/DL</td><td>50–129</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/07/03</td><td>HDL 高密度脂蛋白</td><td class="val-low">35</td><td>MG/DL</td><td>≥ 40</td><td><span class="tag-low">偏低</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">飯前血糖</div>
+    <div class="clinical-note">
+      <strong>三次採檢均為 102 mg/dL</strong>，驚人的一致性（正常上限 99）。屬「糖尿病前期（Pre-diabetes）」警戒區。糖化終產物（AGEs）在血管壁堆積，直接損害腎絲球基底膜的負電荷屏障，使蛋白質漏出 → 加速 eGFR 下降。糖尿病腎病變是台灣最常見 CKD 成因。<br>
+      <strong>建議追蹤 HbA1c</strong>（反映近 3 個月平均血糖），若 HbA1c ≥5.7% 即確認糖尿病前期，需積極飲食介入。
+    </div>
+    <table>
+      <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>114/07/03</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
+        <tr><td>114/08/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
+        <tr><td>114/12/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">持續邊緣</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">嗜酸性白血球</div>
+    <div class="clinical-note">
+      <strong>持續三次偏高（7.1% → 560 → 430）</strong>，是目前最需要與醫師釐清的未解問題。<br>
+      ① <strong>過敏性間質性腎炎（AIN）</strong>：某些藥物（NSAIDs、抗生素、利尿劑、中草藥）可引發腎臟間質發炎，嗜酸球浸潤直接損傷腎小管，造成 eGFR 下降。AIN 是<strong>可逆性腎損傷</strong>，早期停藥有機會部分恢復。<br>
+      ② IgE 51.1（正常），較不支持嚴重過敏；血清蛋白電泳已排除骨髓瘤。<strong>建議告知醫師完整用藥史</strong>。
+    </div>
+    <table>
+      <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>114/09/10</td><td>嗜酸性白血球 %</td><td class="val-high">7.1</td><td>%</td><td>0–5</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/10/29</td><td>嗜酸性白血球計算</td><td class="val-high">560</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">偏高</span></td></tr>
+        <tr><td>114/12/22</td><td>嗜酸性白血球計算</td><td class="val-high">430</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">仍偏高</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════ 最新報告 ══════ -->
+<section class="section" id="lab">
+  <div class="section-label">Latest Report · 2026/03/26–28</div>
+  <div class="section-title">聯合醫事檢驗所 最新報告</div>
+
+  <div class="data-group">
+    <div class="data-group-title">一般生化</div>
+    <div class="clinical-note">
+      <strong>磷（3.1）與鈣（9.4）均正常</strong>——CKD 患者常因腎臟調節失常而異常，目前維持正常是積極管理的成果。<strong>Magnesium 鎂（2.2）正常</strong>，CKD 患者常見鎂蓄積，目前無問題。<br>
+      <strong>A/G Ratio 1.20</strong>（正常低邊緣，正常 1.2–2.0），反映白蛋白相對偏低，與慢性腎病蛋白質流失一致。<strong>γ-GT（20）與 LDH（186）正常</strong>，排除急性肝臟或心肌損傷。
+    </div>
+    <table>
+      <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>IgG/A/M Kappa/Lambda (EP)</td><td>No Paraprotein</td><td>—</td><td>—</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Total Protein (EP) 總蛋白</td><td class="val-ok">7.1</td><td>g/dL</td><td>5.7–8.2</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Calcium 鈣</td><td class="val-ok">9.4</td><td>mg/dL</td><td>8.7–10.4</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Phosphorus 磷</td><td class="val-ok">3.1</td><td>mg/dL</td><td>2.4–5.1</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>γ-GT 肝膽酵素</td><td class="val-ok">20</td><td>U/L</td><td>M: &lt;73</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>LDH 乳酸去氫酵素</td><td class="val-ok">186</td><td>U/L</td><td>120–246</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Magnesium 鎂</td><td class="val-ok">2.2</td><td>mg/dL</td><td>1.8–2.4</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>A/G Ratio</td><td class="val-ok">1.20</td><td>—</td><td>1.2–2.0</td><td><span class="tag-ok">低邊緣</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">免疫 · 特殊項目</div>
+    <div class="clinical-note">
+      <strong>Homocysteine 25.3 umol/L（唯一異常 H）</strong>：最新報告最重要的發現。Hcy 是胺基酸代謝中間產物，偏高直接損傷血管內皮、加速動脈硬化，且腎功能下降使 Hcy 排出減少，形成「eGFR 低 → Hcy 高 → 血管損傷 → eGFR 更低」的惡性循環。葉酸＋B6＋B12 是首要補充目標。<br>
+      <strong>hs-CRP 0.050（極低風險）</strong>：令人驚訝。儘管 eGFR 持續低下，目前無顯著全身急性發炎，提示腎損傷主因是<strong>代謝性（血糖、血脂）而非免疫發炎性</strong>。<strong>C3 補體 132 正常</strong>，排除狼瘡性腎炎等補體消耗型自體免疫腎炎。
+    </div>
+    <table>
+      <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--warn-red);font-weight:400">Homocysteine 同半胱胺酸</td><td class="val-high">25.3</td><td>umol/L</td><td>6.5–19.5</td><td><span class="tag-high">偏高 H</span></td></tr>
+        <tr><td>PTH-i 副甲狀腺素</td><td class="val-ok">50.9</td><td>pg/mL</td><td>18.5–88.0</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
+        <tr><td>hs-CRP 高敏感度</td><td class="val-ok">0.050</td><td>mg/dL</td><td>≤0.330</td><td><span class="tag-ok">極低風險</span></td></tr>
+        <tr><td>C3 補體</td><td class="val-ok">132.0</td><td>mg/dL</td><td>80–170</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>IgA</td><td class="val-ok">289</td><td>mg/dL</td><td>40–350</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>IgE 過敏球蛋白E</td><td class="val-ok">51.1</td><td>IU/mL</td><td>&lt;158.0</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>25-OH Vitamin D Total</td><td class="val-ok">43.4</td><td>ng/mL</td><td>充足 30–100</td><td><span class="tag-ok">充足</span></td></tr>
+        <tr><td>M-peak</td><td>Negative</td><td>—</td><td>Negative</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Albumin(S)</td><td class="val-ok">55.0</td><td>%</td><td>47.0–61.6</td><td><span class="tag-ok">正常</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="data-group">
+    <div class="data-group-title">血清蛋白電泳（SPEP）· QuickScan 2000 WIN · 2026/03/28</div>
+    <div class="clinical-note">
+      <strong>做此電泳的原因</strong>：嗜酸性白血球持續偏高（三次），需排除多發性骨髓瘤及漿細胞疾病（會分泌單株免疫球蛋白，也可能造成腎損傷）。<br>
+      <strong>Alpha-2 球蛋白（12.4%）</strong>靠近正常上限（14.9%）：主要包含 α2-macroglobulin 與 Haptoglobin，均為急性期反應蛋白，在<strong>慢性腎病狀態下因分子量大不易流失而相對濃縮</strong>，與 eGFR 偏低背景完全一致，屬預期表現，不需特別擔心。
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;background:rgba(122,158,138,.1);border:1px solid rgba(122,158,138,.3);border-radius:10px;padding:1rem 1.4rem;margin-bottom:1.4rem;">
+      <div style="font-size:1.8rem;">✅</div>
       <div>
-        <div class="patient-label">Health Monitor</div>
-        <div class="patient-name">呂昇鴻｜60歲 男性</div>
-        <div class="patient-meta" id="meta-line"></div>
-      </div>
-      <div class="header-btns">
-        <button class="btn btn-primary" onclick="openModal()">＋ 新增數據</button>
+        <div style="font-size:.92rem;color:var(--sage-deep);font-weight:400;letter-spacing:.05em;">No Paraprotein — 未發現單株免疫球蛋白</div>
+        <div style="font-size:.75rem;color:var(--stone);margin-top:.2rem;">免疫固定電泳 SP · IgG · IgA · IgM · Kappa · Lambda 六道均陰性，排除多發性骨髓瘤及漿細胞病變</div>
       </div>
     </div>
-    <div class="filter-tabs">
-      <button class="tab active" onclick="setFilter('all',this)">全部</button>
-      <button class="tab" id="tab-abnormal" onclick="setFilter('abnormal',this)">異常</button>
-      <button class="tab" id="tab-normal"   onclick="setFilter('normal',this)">正常</button>
-    </div>
-    <div class="cat-tabs" id="cat-tabs"></div>
+    <table>
+      <thead><tr><th>分區</th><th>實測 %</th><th>參考範圍 %</th><th>g/dL</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>Albumin 白蛋白</td><td class="val-ok">55.0</td><td>47.0–61.6</td><td>3.9</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Alpha-1</td><td class="val-ok">3.3</td><td>2.0–4.4</td><td>0.2</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Alpha-2</td><td class="val-ok">12.4</td><td>8.9–14.9</td><td>0.9</td><td><span class="tag-ok">正常（靠近上限）</span></td></tr>
+        <tr><td>Beta</td><td class="val-ok">14.3</td><td>10.8–16.2</td><td>1.0</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>Gamma</td><td class="val-ok">15.0</td><td>9.8–24.4</td><td>1.1</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr style="border-top:2px solid var(--taupe)"><td style="font-weight:400;color:var(--charcoal)">Total</td><td colspan="2">—</td><td style="font-weight:400">7.1</td><td><span class="tag-ok">正常</span></td></tr>
+        <tr><td>A/G Ratio</td><td colspan="2">—</td><td class="val-ok">1.2</td><td><span class="tag-ok">正常</span></td></tr>
+      </tbody>
+    </table>
   </div>
-</div>
+</section>
 
-<div class="main">
-  <div class="alert-banner hidden" id="alert-banner">
-    ⚠️ 需要優先關注：<strong id="alert-items"></strong>
-  </div>
-  <div id="cards-container"></div>
-  <div class="footer">
-    本追蹤表僅供個人健康管理參考，不取代醫師診斷與治療建議<br>
-    數據來源：台中聯合醫事檢驗所 / 大安聯合醫事檢驗所<br>
-    最早記錄：2025-07-03　|　最新報告：2026-03-26
-  </div>
-</div>
+<!-- ══════ 指標交叉解讀 ══════ -->
+<section class="section" id="interp">
+  <div class="section-label">Cross-Indicator Interpretation</div>
+  <div class="section-title">指標交叉解讀</div>
 
-<div class="overlay" id="modal-overlay">
-  <div class="modal">
-    <div class="modal-title">新增檢驗數據</div>
-    <div class="modal-sub">填入本次報告數值，留空代表未檢測</div>
-    <div class="modal-grid" id="modal-grid"></div>
-    <div class="modal-btns">
-      <button class="modal-save" onclick="saveData()">儲存</button>
-      <button class="modal-cancel" onclick="closeModal()">取消</button>
+  <div class="chain-section">
+    <div class="chain-title">核心病理鏈條</div>
+
+    <div class="chain">
+      <span class="chain-node cn-warn">血糖邊緣 102</span><span class="chain-arrow">＋</span>
+      <span class="chain-node cn-bad">LDL 163 偏高</span><span class="chain-arrow">＋</span>
+      <span class="chain-node cn-bad">HDL 35 偏低</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">腎絲球微血管硬化</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">eGFR 持續 ≈50</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">BUN 27.8 蓄積</span>
+    </div>
+    <div class="chain-label">▸ 代謝症候群三重奏（血糖邊緣 ＋ 高LDL ＋ 低HDL）是腎臟慢性缺血的根本背景，長期默默侵蝕腎絲球，這是所有問題的源頭</div>
+
+    <div class="chain">
+      <span class="chain-node cn-bad">eGFR ↓ 腎清除力下降</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">Hcy 排出減少</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">Homocysteine 25.3 偏高</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">血管內皮損傷加劇</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">腎臟血管進一步惡化</span>
+    </div>
+    <div class="chain-label">▸ eGFR 低 → Hcy 升 → 腎損傷更重，兩者互為因果形成惡性循環，葉酸＋B群可打斷此循環</div>
+
+    <div class="chain">
+      <span class="chain-node cn-bad">eGFR ↓ 活化VitD不足</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-warn">PTH 82.9 升高（114/09）</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-ok">補充 VitD3</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-ok">PTH 50.9 正常（2026/03）✅</span><span class="chain-arrow">←</span>
+      <span class="chain-node cn-ok">VitD 43.4 充足</span>
+    </div>
+    <div class="chain-label">▸ 繼發性副甲狀腺亢進透過 VitD 補充已成功改善，是目前唯一完成閉環的治療鏈條</div>
+
+    <div class="chain">
+      <span class="chain-node cn-bad">嗜酸球 430–560 偏高</span><span class="chain-arrow">?→</span>
+      <span class="chain-node cn-neutral">藥物性間質性腎炎（AIN）</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">腎小管損傷</span><span class="chain-arrow">→</span>
+      <span class="chain-node cn-bad">eGFR 額外下降</span>
+    </div>
+    <div class="chain-label">▸ 此路徑「可能但未確認」，需調查完整用藥史。AIN 是少數可逆性腎損傷——若確診且早期停藥，eGFR 有機會部分恢復</div>
+  </div>
+
+  <div style="font-size:.8rem;color:var(--stone);margin-bottom:1.2rem;">各指標最新數值 · 臨床意義 · 與其他指標的關聯標籤</div>
+
+  <div class="interp-grid">
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">eGFR 腎絲球過濾率</div><div class="ic-date">最新 114/12/22</div></div>
+        <div><div class="ic-val high">49.77</div><div class="ic-range">ml/min（正常 ≥101）</div></div>
+      </div>
+      <div class="ic-meaning">所有腎功能指標的<strong>核心主軸</strong>。49.77 = CKD 第 3a 期，代表腎功能已中度下降，保留約 50% 過濾能力。半年最高僅 55.63，近期回落至 49.77，下降趨勢令人擔憂。此值直接決定藥物劑量、補充品安全性及飲食蛋白質限制嚴格程度。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">→ BUN 蓄積升高</span>
+        <span class="ic-link rel-high">→ Hcy 排出減少</span>
+        <span class="ic-link rel-high">→ PTH 繼發升高</span>
+        <span class="ic-link rel-high">← 蛋白尿加速損傷</span>
+        <span class="ic-link rel-warn">← LDL 高加速動脈硬化</span>
+        <span class="ic-link rel-warn">← 血糖 102 長期傷害</span>
+        <span class="ic-link rel-warn">← 嗜酸球 AIN 可能額外損傷</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">Homocysteine 同半胱胺酸</div><div class="ic-date">最新 2026/03/26</div></div>
+        <div><div class="ic-val high">25.3</div><div class="ic-range">umol/L（正常 6.5–19.5）</div></div>
+      </div>
+      <div class="ic-meaning">最新報告<strong>唯一異常值</strong>，也是與 eGFR 最直接互相影響的指標。Hcy 偏高直接損傷血管內皮，加速動脈硬化；而 eGFR 低使 Hcy 排出減少，形成惡性循環。同時與 LDL 偏高協同放大心血管與腎臟損傷風險。葉酸＋B6＋B12 是目前<strong>最有直接實證的介入方式</strong>。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">← eGFR ↓ 導致 Hcy 蓄積</span>
+        <span class="ic-link rel-high">→ 加速腎臟微血管損傷</span>
+        <span class="ic-link rel-warn">→ 協同 LDL 損傷血管內皮</span>
+        <span class="ic-link rel-ok">↓ 葉酸＋B6＋B12 可改善</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">血中尿素氮 BUN</div><div class="ic-date">最新 114/12/22</div></div>
+        <div><div class="ic-val high">27.8</div><div class="ic-range">MG/DL（正常 5–20）</div></div>
+      </div>
+      <div class="ic-meaning">蛋白質代謝廢物，由肝臟產生、腎臟排出。<strong>呈持續上升趨勢</strong>（7月 20.9 → 12月 27.8），是腎臟清廢能力下滑的直接反映。BUN 同時受飲食蛋白質攝取影響——若目前蛋白質攝取已受控制，BUN 升高純粹反映腎功能惡化；<strong>BUN/CRE ≈ 17.6（正常 10–20）</strong>，排除上消化道出血及嚴重脫水。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">← eGFR ↓ 清廢能力下滑</span>
+        <span class="ic-link rel-warn">← 高蛋白飲食使值升高</span>
+        <span class="ic-link rel-ok">BUN/CRE = 17.6（正常比值）</span>
+        <span class="ic-link rel-info">→ 反映腎臟清除能力趨勢</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">LDL / HDL 膽固醇</div><div class="ic-date">最新 114/07/03</div></div>
+        <div><div class="ic-val warn">163 / 35</div><div class="ic-range">MG/DL（LDL &lt;129 / HDL ≥40）</div></div>
+      </div>
+      <div class="ic-meaning"><strong>最危險的血脂組合</strong>：LDL 偏高在腎臟動脈沉積，HDL 偏低失去清除保護。CKD 患者心血管疾病風險是一般人 2–3 倍，目前 LDL 163 遠超 CKD 患者目標值（&lt;100 mg/dL），是目前<strong>需要最積極討論藥物介入</strong>的指標。與血糖邊緣值協同構成代謝症候群，共同損害腎臟微血管。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">→ 加速腎臟動脈硬化 → eGFR ↓</span>
+        <span class="ic-link rel-high">→ 協同 Hcy 損傷血管內皮</span>
+        <span class="ic-link rel-warn">← 血糖邊緣加重血脂異常</span>
+        <span class="ic-link rel-ok">↓ Omega-3 魚油可改善</span>
+        <span class="ic-link rel-info">CKD 目標 LDL &lt;100 mg/dL</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">飯前血糖 Glucose</div><div class="ic-date">最新 114/12/22</div></div>
+        <div><div class="ic-val warn">102</div><div class="ic-range">MG/DL（正常 60–99）</div></div>
+      </div>
+      <div class="ic-meaning"><strong>三次採檢均為 102 mg/dL</strong>，驚人的一致性。糖化終產物（AGEs）直接損害腎絲球基底膜負電荷屏障，造成蛋白質漏出（蛋白尿）→ 加速 eGFR 下降。同時 CKD 本身也會加重胰島素阻抗，使血糖控制更困難，形成雙向惡化。<strong>追蹤 HbA1c 是確認此風險是否需要積極介入的關鍵步驟</strong>。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">→ 損傷腎絲球屏障 → 蛋白尿 → eGFR ↓</span>
+        <span class="ic-link rel-high">→ 協同 LDL 加速血管硬化</span>
+        <span class="ic-link rel-warn">← CKD 加重胰島素阻抗</span>
+        <span class="ic-link rel-info">→ 建議追蹤 HbA1c</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">PTH-i 副甲狀腺素</div><div class="ic-date">最新 2026/03/26</div></div>
+        <div><div class="ic-val ok">50.9</div><div class="ic-range">pg/mL（正常 18.5–88）</div></div>
+      </div>
+      <div class="ic-meaning"><strong>最成功的改善案例</strong>：從 114/09 的 82.9（異常）→ 2026/03 的 50.9（正常）。CKD → 腎臟活化 VitD 能力下降 → PTH 代償升高，長期高 PTH 造成骨質流失與血管鈣化。同期 VitD 達 43.4 ng/mL（充足），直接促成 PTH 改善。目前這條鏈條已<strong>成功閉環，維持現有策略即可</strong>。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">← eGFR ↓ → VitD 活化不足</span>
+        <span class="ic-link rel-ok">← VitD 43.4 充足 → PTH 已正常化 ✅</span>
+        <span class="ic-link rel-info">磷 3.1 / 鈣 9.4 均正常</span>
+        <span class="ic-link rel-warn">避免 VitD 過量（>100 ng/mL）</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">嗜酸性白血球</div><div class="ic-date">最新 114/12/22</div></div>
+        <div><div class="ic-val warn">430</div><div class="ic-range">cell/μL（正常 50–350）</div></div>
+      </div>
+      <div class="ic-meaning">持續三次偏高，是目前<strong>最需要釐清的未解指標</strong>。若確為藥物性間質性腎炎（AIN），停用致病藥物後 eGFR 有機會部分恢復——這是目前資料中<strong>少數可逆的腎損傷原因</strong>，值得積極追查。IgE 正常（51.1）較不支持嚴重過敏；電泳排除骨髓瘤；C3 正常排除 SLE。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">? → 藥物性 AIN → eGFR ↓（可逆）</span>
+        <span class="ic-link rel-info">IgE 51.1 正常（不支持嚴重過敏）</span>
+        <span class="ic-link rel-ok">電泳排除骨髓瘤</span>
+        <span class="ic-link rel-ok">C3 正常排除 SLE 腎炎</span>
+        <span class="ic-link rel-warn">→ 需告知醫師完整用藥史</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">hs-CRP 高敏感度 C 反應蛋白</div><div class="ic-date">最新 2026/03/26</div></div>
+        <div><div class="ic-val ok">0.050</div><div class="ic-range">mg/dL（正常 ≤0.330）</div></div>
+      </div>
+      <div class="ic-meaning"><strong>意外的低炎症數值</strong>（AHA/CDC 低風險 &lt;0.1 mg/dL）。儘管 eGFR 持續偏低，目前並無顯著全身急性發炎。這告訴我們：腎臟損傷的主要機制是<strong>代謝性（血糖邊緣、高LDL、低HDL）而非免疫發炎性</strong>，同時有助排除狼瘡性腎炎、急性腎絲球腎炎等活動期發炎性腎病的可能性，縮小鑑別診斷範圍。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-ok">支持代謝性腎損傷機制</span>
+        <span class="ic-link rel-ok">排除活動性全身發炎腎病</span>
+        <span class="ic-link rel-info">C3 補體 132 正常 → 排除 SLE 腎炎</span>
+        <span class="ic-link rel-warn">← 嗜酸球偏高仍需追蹤</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">24小時尿蛋白 / 微白蛋白</div><div class="ic-date">最新 114/12/22</div></div>
+        <div><div class="ic-val ok">109.2</div><div class="ic-range">MG/Day（正常 0–150）✅</div></div>
+      </div>
+      <div class="ic-meaning"><strong>最重要的正向改善訊號</strong>：從 114/08 的 248.1 → 114/12 的 109.2，回歸正常範圍。蛋白尿既是腎損傷的反映，也是加速損傷的元兇（漏出蛋白在腎小管引發二次損傷）。改善代表腎絲球屏障有所修復或穩定。但早期微白蛋白 186.5 mg/L、M/C ratio 224.7% 均遠超正常，損傷啟動已久，<strong>需持續每 3 個月監測，不能輕忽</strong>。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-high">← 血糖邊緣損害腎絲球屏障</span>
+        <span class="ic-link rel-high">↔ 蛋白尿本身加速 eGFR 下降</span>
+        <span class="ic-link rel-ok">目前回歸正常是最重要正向訊號 ✅</span>
+        <span class="ic-link rel-info">需每 3 月持續監測</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">25-OH Vitamin D</div><div class="ic-date">最新 2026/03/26</div></div>
+        <div><div class="ic-val ok">43.4</div><div class="ic-range">ng/mL（充足 30–100）</div></div>
+      </div>
+      <div class="ic-meaning">目前充足範圍（30–100 ng/mL），<strong>直接對應 PTH 從 82.9 → 50.9 改善的成果</strong>。活性 VitD 不僅調節鈣磷代謝，還具有直接<strong>抗腎臟纖維化、抑制 Renin-Angiotensin 系統</strong>的腎臟保護效果。CKD 患者腎臟活化 VitD 能力下降，需持續補充 VitD3 維持充足。<strong>避免過量（&gt;100 ng/mL 有毒性風險）</strong>，維持現狀即可。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-ok">→ 促進 PTH 從 82.9 → 50.9 ✅</span>
+        <span class="ic-link rel-ok">→ 抑制腎臟纖維化</span>
+        <span class="ic-link rel-info">← CKD 腎臟活化 VitD 能力下降</span>
+        <span class="ic-link rel-warn">避免 &gt;100 ng/mL（毒性風險）</span>
+      </div>
+    </div>
+
+    <div class="interp-card">
+      <div class="ic-head">
+        <div><div class="ic-name">Alpha-2 球蛋白（電泳）</div><div class="ic-date">2026/03/28</div></div>
+        <div><div class="ic-val ok">12.4%</div><div class="ic-range">（正常 8.9–14.9%）</div></div>
+      </div>
+      <div class="ic-meaning">雖在正常範圍，<strong>靠近上限（上限 14.9%）</strong>。Alpha-2 主要成分包含 α2-macroglobulin（分子量大，腎病時因無法從腎臟流失而相對濃縮）與 Haptoglobin（急性期反應蛋白，慢性發炎時升高）。兩者共同推高 Alpha-2，與<strong>eGFR 偏低的慢性腎病背景完全一致，屬預期表現</strong>，無需額外擔心。搭配 hs-CRP 極低（0.050），確認目前無急性發炎疊加。</div>
+      <div class="ic-links">
+        <span class="ic-link rel-info">← eGFR 偏低 → α2-MG 相對濃縮</span>
+        <span class="ic-link rel-info">← 慢性腎病背景下的預期表現</span>
+        <span class="ic-link rel-ok">無 M 蛋白峰，排除骨髓瘤</span>
+        <span class="ic-link rel-ok">hs-CRP 極低，無急性發炎疊加</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════ 保健攝取 ══════ -->
+<section class="section" id="supp">
+  <div class="section-label">Supplement Guide</div>
+  <div class="section-title">保健食品攝取建議</div>
+
+  <div class="protein-box">
+    <div class="protein-col">
+      <h4>每日蛋白質攝取目標</h4>
+      <div class="protein-row">正常人<span>0.8–1.0 g / 公斤體重</span></div>
+      <div class="protein-row" style="color:var(--rose-deep);font-weight:400">CKD G3（您的狀況）<span style="color:var(--rose-deep)">0.6–0.8 g / 公斤體重</span></div>
+      <div class="protein-row">蛋白尿明顯期<span>由腎臟營養師精算</span></div>
+      <div style="font-size:.75rem;color:var(--stone);margin-top:1rem;padding:.7rem;background:var(--cream);border-radius:8px;">選高品質蛋白：蛋 · 魚 · 雞胸肉<br>避免大量攝取乳清蛋白粉</div>
+    </div>
+    <div class="protein-col">
+      <h4>補充優先順序對應指標</h4>
+      <div class="protein-row">Homocysteine 25.3（最新唯一異常）<span style="color:var(--warn-red)">第一優先：葉酸＋B群</span></div>
+      <div class="protein-row">LDL 163 / HDL 35<span style="color:var(--warn-yellow)">Omega-3 魚油</span></div>
+      <div class="protein-row">eGFR 持續 ≈50<span style="color:var(--warn-yellow)">CoQ10 腎細胞保護</span></div>
+      <div class="protein-row">PTH 已改善 / VitD 充足<span style="color:var(--ok-green)">維持現有 VitD ✅</span></div>
     </div>
   </div>
-</div>
+
+  <div class="supp-grid">
+    <div class="supp-card c1"><div class="supp-icon">🧬</div><div class="supp-name">葉酸 ＋ 維生素 B6 · B12</div><div class="supp-dose">葉酸 800mcg ／ B12 1000mcg · 每日</div><div class="supp-reason">針對 Homocysteine 25.3 umol/L 偏高。葉酸與 B 群是代謝 Hcy 的必需輔酶，可打斷「eGFR 低 → Hcy 高 → 血管損傷」的惡性循環，是目前最有實證的介入。</div><span class="supp-target">針對：Homocysteine ↑ · 心血管保護</span></div>
+    <div class="supp-card c2"><div class="supp-icon">🐟</div><div class="supp-name">Omega-3 深海魚油</div><div class="supp-dose">EPA＋DHA 合計 2–4g · 每日</div><div class="supp-reason">同時改善 LDL 偏高（163）、HDL 偏低（35）與腎臟發炎，研究顯示可減少蛋白尿。一舉改善代謝症候群三個問題。選高純度分子蒸餾產品。</div><span class="supp-target">針對：血脂 · 蛋白尿 · 腎臟發炎</span></div>
+    <div class="supp-card c3"><div class="supp-icon">⚡</div><div class="supp-name">輔酶 Q10（CoQ10）</div><div class="supp-dose">100–200mg · 每日</div><div class="supp-reason">保護腎臟細胞粒線體功能。CKD 患者體內 CoQ10 偏低，補充有助延緩腎細胞氧化損傷。建議與含油脂餐食同服以提高吸收率。</div><span class="supp-target">針對：腎細胞保護 · 抗氧化</span></div>
+    <div class="supp-card c4"><div class="supp-icon">🌿</div><div class="supp-name">薑黃素（Curcumin）</div><div class="supp-dose">高吸收劑型（含 Piperine）</div><div class="supp-reason">抗發炎、抑制腎臟纖維化。<strong>必須選含胡椒鹼（Piperine）的高吸收劑型</strong>，否則薑黃素口服吸收率低於 1%，完全無效。</div><span class="supp-target">針對：腎臟纖維化 · 發炎抑制</span></div>
+    <div class="supp-card c5"><div class="supp-icon">☀️</div><div class="supp-name">維生素 D3</div><div class="supp-dose">維持現狀（目前已充足）</div><div class="supp-reason">25-OH VitD 43.4 ng/mL 已充足，PTH 已從 82.9 降至 50.9，代表目前劑量有效。無需大量增加，<strong>過量（&gt;100 ng/mL）有毒性風險</strong>。</div><span class="supp-target">✅ PTH 已從 82.9 降至 50.9</span></div>
+    <div class="supp-card c6"><div class="supp-icon">🌾</div><div class="supp-name">飲食蛋白質控制</div><div class="supp-dose">0.6–0.8 g / 公斤體重 · 每日</div><div class="supp-reason">非補充品，但是<strong>最重要的介入</strong>。過量蛋白質直接升高 BUN（目前 27.8）並加重腎絲球壓力，加速 eGFR 惡化。建議諮詢腎臟專科營養師精算。</div><span class="supp-target">最高優先：降低 BUN · 減少腎臟負擔</span></div>
+  </div>
+
+  <div style="font-size:.82rem;font-weight:400;color:var(--charcoal);margin-bottom:.8rem;">⛔ 應避免的補充品</div>
+  <div class="avoid-grid">
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">高劑量蛋白粉 · 乳清蛋白</div><div class="avoid-why">直接升高 BUN，加重腎絲球過濾壓力</div></div></div>
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">高劑量維生素 C（每日 &gt;500mg）</div><div class="avoid-why">代謝產物草酸鹽在腎臟結晶沉積</div></div></div>
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">草藥類「補腎」產品</div><div class="avoid-why">部分含馬兜鈴酸，強烈腎毒性（台灣已有案例）</div></div></div>
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">高鉀補充品 · 大量香蕉堅果</div><div class="avoid-why">eGFR 低時鉀離子排出減慢，易引發危險高血鉀</div></div></div>
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">高劑量維生素 A</div><div class="avoid-why">腎病患者代謝慢，易累積中毒</div></div></div>
+    <div class="avoid-item"><div class="avoid-x">✕</div><div><div class="avoid-name">高磷食品補充劑</div><div class="avoid-why">CKD 鈣磷代謝已受影響，需避免磷蓄積</div></div></div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">控制每日蛋白質攝取 <span class="step-tag">最高優先</span></div><div class="step-desc">諮詢腎臟科或腎臟營養師，依體重精算每日上限（0.6–0.8g/kg）。這是延緩 BUN 上升（目前 27.8）與 eGFR 惡化最直接有效的單一行動。</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">補充葉酸 800mcg ＋ B12 1000mcg <span class="step-tag">急迫</span></div><div class="step-desc">針對 Homocysteine 25.3 umol/L（最新報告唯一異常值），打斷「eGFR 低 → Hcy 高 → 腎血管損傷」的惡性循環。</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">開始 Omega-3 魚油（EPA+DHA 2–4g／天）</div><div class="step-desc">同時改善 LDL 偏高、HDL 偏低與腎臟發炎，選擇高純度分子蒸餾魚油，避免重金屬汙染。</div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">追蹤 HbA1c 醣化血色素 <span class="step-tag">建議安排</span></div><div class="step-desc">三次血糖 102 mg/dL，HbA1c 可確認是否已達糖尿病前期（≥5.7%）。若確認，需積極飲食控制，防止腎功能進一步惡化。</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">告知醫師完整用藥史 <span class="step-tag">需釐清</span></div><div class="step-desc">嗜酸性白血球持續偏高（430–560），需排除過敏性間質性腎炎（AIN）。若確診 AIN 且早期停藥，eGFR 有機會部分恢復——這是目前資料中少數可逆的腎損傷原因。</div></div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-content"><div class="step-title">定期追蹤 eGFR · BUN · 尿蛋白 · Hcy <span class="step-tag">每 1–3 個月</span></div><div class="step-desc">eGFR 最新 49.77 較 9 月高點（55.63）明顯下降，趨勢值得警惕。建議攜帶此份報告至腎臟科門診，討論是否需要腎臟超音波及更積極的治療策略。</div></div></div>
+  </div>
+
+  <div style="background:rgba(90,82,80,.05);border:1px solid var(--taupe);border-radius:12px;padding:1.4rem 1.8rem;font-size:.78rem;color:var(--stone);line-height:1.8;">
+    ⚠️ 本頁保健建議為參考用途，所有補充品的劑量與種類請在開始前告知腎臟科醫師確認。部分補充品在腎功能不佳時需要調整劑量，切勿自行大量服用。
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>呂昇鴻</strong> 健康管理儀表板 · 資料來源：健檢Excel（114/07–12）＋ 聯合醫事檢驗所（2026/03/26）＋ 血清蛋白電泳（2026/03/28）<br>
+  本報告僅供個人健康追蹤參考，不構成醫療診斷。請以主治醫師評估為準。
+</footer>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CLINICAL CONFIG
-// ═══════════════════════════════════════════════════════
-const CLINICAL = {
-  // ── 腎臟功能 ────────────────────────────────────────
-  eGFR:{
-    label:"腎絲球過濾率 eGFR", tag:"腎臟功能", cat:"腎臟", unit:"ml/min/1.73m²",
-    ref:{low:60, high:999}, color:"#b07070",
-    meaning:"評估腎臟過濾功能的核心指標。60以下代表慢性腎病（CKD）：60–89輕度、45–59中度偏低（G3a）、30–44中度偏高（G3b）。本患者eGFR持續落在49–55區間，屬CKD G3a–G3b，需積極保護腎功能、控制血壓及蛋白尿。"
-  },
-  CRE_blood:{
-    label:"血清肌酸酐", tag:"腎臟功能", cat:"腎臟", unit:"mg/dL",
-    ref:{low:0.6, high:1.5}, color:"#b07070",
-    meaning:"腎臟排除肌酸酐的能力指標。男性正常上限1.5 mg/dL。數值持續偏高（1.4–1.58）配合eGFR低下，確認腎功能損傷。每升高0.1 mg/dL，對應eGFR約下降5–7 ml/min。"
-  },
-  BUN:{
-    label:"血中尿素氮 BUN", tag:"腎臟功能", cat:"腎臟", unit:"mg/dL",
-    ref:{low:5, high:20}, color:"#b09070",
-    meaning:"腎臟排除尿素氮的能力指標。持續偏高（19–28）反映腎臟清除廢物效率下降。BUN/Creatinine比值可區分腎前性（脫水/蛋白攝取過高）與腎性損傷。"
-  },
-  Urine24hProtein:{
-    label:"24小時尿蛋白", tag:"腎臟功能", cat:"腎臟", unit:"mg/Day",
-    ref:{low:0, high:150}, color:"#b07070",
-    meaning:"評估腎小球屏障損傷程度。正常應低於150 mg/Day。本患者從248 mg降至109 mg，顯示蛋白尿有所改善，但仍超標。持續蛋白尿是腎功能惡化的強力預測因子，也與心血管風險相關。"
-  },
-  Microalbumin:{
-    label:"微白蛋白尿", tag:"腎臟功能", cat:"腎臟", unit:"mg/L",
-    ref:{low:0, high:25}, color:"#b07070",
-    meaning:"腎小球早期損傷的敏感指標，也是心血管風險標記。正常<25 mg/L。本患者186.5→77.9，雖有改善但仍嚴重偏高，屬顯性蛋白尿（Macroalbuminuria），提示腎小球屏障受損明顯。"
-  },
-  MC_ratio:{
-    label:"微白蛋白/肌酸酐比", tag:"腎臟功能", cat:"腎臟", unit:"mg/gCr",
-    ref:{low:0, high:30}, color:"#b07070",
-    meaning:"校正尿液稀釋度的蛋白尿指標，比單次尿液微白蛋白更準確。正常<30 mg/gCr，30–300為微量蛋白尿，>300為顯性蛋白尿。本患者224–200，屬顯性蛋白尿範圍，腎小球損傷明確。"
-  },
-
-  // ── 心血管 ───────────────────────────────────────────
-  Homocysteine:{
-    label:"同半胱胺酸", tag:"心血管", cat:"心血管", unit:"umol/L",
-    ref:{low:6.5, high:19.5}, color:"#b07070",
-    meaning:"血管健康核心指標。升高代表氧化壓力增加，直接損傷血管內皮細胞，增加中風、心肌梗塞及靜脈血栓風險。與葉酸/B12甲基化代謝密切相關。數值25.3需積極補充活性葉酸與甲鈷胺。"
-  },
-  LDL:{
-    label:"低密度脂蛋白 LDL", tag:"心血管", cat:"心血管", unit:"mg/dL",
-    ref:{low:0, high:129}, color:"#b07070",
-    meaning:"「壞膽固醇」，與動脈硬化直接相關。7月163→8月77→12月69，顯示極大改善（可能已用藥治療）。CKD患者建議LDL<70 mg/dL，目前已接近目標值。"
-  },
-  HDL:{
-    label:"高密度脂蛋白 HDL", tag:"心血管", cat:"心血管", unit:"mg/dL",
-    ref:{low:40, high:999}, color:"#b09070",
-    meaning:"「好膽固醇」，有助清除血管中多餘膽固醇。男性應≥40 mg/dL，理想≥60 mg/dL。7月測值35偏低，提示心血管保護力不足。建議增加有氧運動、戒菸、補充Omega-3。"
-  },
-  TotalCholesterol:{
-    label:"總膽固醇", tag:"心血管", cat:"心血管", unit:"mg/dL",
-    ref:{low:100, high:200}, color:"#b07070",
-    meaning:"所有脂蛋白中膽固醇的總量。7月224偏高，配合當時LDL 163，顯示脂質代謝異常。目前LDL已大幅下降，推測總膽固醇也已改善（建議下次追查）。"
-  },
-  TG:{
-    label:"三酸甘油脂 TG", tag:"心血管", cat:"心血管", unit:"mg/dL",
-    ref:{low:50, high:200}, color:"#8fa3a8",
-    meaning:"血液中脂肪含量指標。>200需注意，>500有胰臟炎風險。本患者101–180，目前正常但12月上升至152，與飲食及代謝有關。CKD患者TG常偏高，建議減少精緻糖與精緻澱粉。"
-  },
-  NTproBNP:{
-    label:"NT-proBNP 心衰指標", tag:"心血管", cat:"心血管", unit:"pg/mL",
-    ref:{low:0, high:125}, color:"#7a9e8a",
-    meaning:"心臟壓力/心室功能的敏感指標，用於評估心臟衰竭。<125 pg/mL排除急性心衰竭。目前30.7屬正常水準，顯示心臟尚未出現明顯衰竭跡象。需注意CKD患者基礎值可能稍高。"
-  },
-
-  // ── 血糖 ────────────────────────────────────────────
-  FBG:{
-    label:"空腹血糖", tag:"血糖代謝", cat:"血糖", unit:"mg/dL",
-    ref:{low:60, high:99}, color:"#b09070",
-    meaning:"空腹8小時後的血糖值。100–125 mg/dL為糖尿病前期（空腹血糖過高）。本患者反覆測得102，屬糖尿病前期邊緣，配合CKD背景，建議減少精緻碳水、規律運動，每年追蹤HbA1c。"
-  },
-  HbA1c:{
-    label:"醣化血色素 HbA1c", tag:"血糖代謝", cat:"血糖", unit:"%",
-    ref:{low:4.3, high:6.3}, color:"#7a9e8a",
-    meaning:"反映過去2–3個月的平均血糖控制狀況。5.7–6.4%為糖尿病前期。本患者三次均為5.8%，正常範圍但屬偏高區域，需持續觀察是否上升。CKD患者HbA1c可能因溶血稍被低估。"
-  },
-
-  // ── 嗜酸性球 ─────────────────────────────────────────
-  Eosinophil_abs:{
-    label:"嗜酸性球絕對計數", tag:"免疫/過敏", cat:"免疫", unit:"/μL (×10⁻³)",
-    ref:{low:50, high:350}, color:"#b07070",
-    meaning:"嗜酸性白血球的絕對數量。>350屬輕度升高，>1500為中度，>5000為重度。本患者560→430，輕度偏高且有下降趨勢。IgE正常的情況下，需優先排查寄生蟲感染（尤其弓蛔蟲Toxocara）。"
-  },
-  Eosinophil_pct:{
-    label:"嗜酸性球百分比", tag:"免疫/過敏", cat:"免疫", unit:"%",
-    ref:{low:0, high:5}, color:"#b07070",
-    meaning:"嗜酸性球佔白血球的比例。>5%為偏高。本患者9月測得7.1%，配合絕對計數偏高，提示嗜酸性球活化。非IgE媒介型免疫反應或組織型寄生蟲感染是最可能原因。"
-  },
-
-  // ── 內分泌 ───────────────────────────────────────────
-  "PTH-i":{
-    label:"副甲狀腺素 PTH-i", tag:"內分泌", cat:"內分泌", unit:"pg/mL",
-    ref:{low:15, high:68}, color:"#b09070",
-    meaning:"調節鈣磷平衡的荷爾蒙。CKD患者腎臟無法活化維生素D，導致PTH代償性升高（繼發性副甲亢），加速骨質流失及血管鈣化。9月82.9偏高，12月49.4回歸正常，追蹤中。"
-  },
-  TSH:{
-    label:"甲狀腺刺激素 TSH", tag:"內分泌", cat:"內分泌", unit:"UIU/mL",
-    ref:{low:0.35, high:4.94}, color:"#7a9e8a",
-    meaning:"評估甲狀腺功能的主要指標。TSH偏低=甲亢，偏高=甲低。甲狀腺低下可使同半胱胺酸升高並加速腎功能惡化。目前3.0在正常範圍，甲狀腺功能正常。"
-  },
-  UricAcid:{
-    label:"尿酸", tag:"代謝", cat:"代謝", unit:"mg/dL",
-    ref:{low:4, high:7}, color:"#7a9e8a",
-    meaning:"嘌呤代謝終產物。>7 mg/dL為高尿酸血症（痛風風險）；<4 mg/dL可能代謝過快或飲食攝取不足。9月3.9偏低，可能與飲食改變或排泄增加有關。高尿酸本身也會加速腎功能惡化。"
-  },
-
-  // ── 肝臟 ────────────────────────────────────────────
-  ALT:{
-    label:"肝功能 ALT", tag:"肝臟", cat:"肝臟", unit:"U/L",
-    ref:{low:4, high:40}, color:"#7a9e8a",
-    meaning:"肝細胞損傷最敏感的指標。升高提示病毒性肝炎、脂肪肝、藥物損傷或酒精性肝炎。本患者13–17，持續在正常範圍低端，顯示肝臟功能良好。"
-  },
-  "γ-GT":{
-    label:"肝膽酵素 γ-GT", tag:"肝臟", cat:"肝臟", unit:"U/L",
-    ref:{low:0, high:73}, color:"#7a9e8a",
-    meaning:"肝膽功能敏感指標。飲酒、脂肪肝、膽道阻塞時升高。目前20 U/L屬優異水準，幾乎排除酒精性及膽道疾病。"
-  },
-  LDH:{
-    label:"乳酸去氫酵素 LDH", tag:"肝臟", cat:"肝臟", unit:"U/L",
-    ref:{low:120, high:246}, color:"#9a8faa",
-    meaning:"組織損傷非特異性指標。搭配亞型分析（LDH1-5全數正常）確認無特定器官急性損傷，整體組織狀態穩定。"
-  },
-
-  // ── 蛋白電泳 ─────────────────────────────────────────
-  "Total Protein":{
-    label:"總蛋白", tag:"蛋白電泳", cat:"蛋白", unit:"g/dL",
-    ref:{low:5.7, high:8.2}, color:"#8fa3a8",
-    meaning:"反映肝臟合成功能及整體營養狀態。目前7.1正常，配合No Paraprotein的電泳結果，完全排除多發性骨髓瘤。"
-  },
-  Albumin:{
-    label:"白蛋白比例", tag:"蛋白電泳", cat:"蛋白", unit:"%",
-    ref:{low:47.0, high:61.6}, color:"#8fa3a8",
-    meaning:"蛋白電泳最大分區。目前55.0%正常，但CKD患者應密切追蹤，蛋白尿會導致白蛋白流失，使比例下降。"
-  },
-  "A/G Ratio":{
-    label:"白蛋白/球蛋白比", tag:"蛋白電泳", cat:"蛋白", unit:"",
-    ref:{low:1.2, high:2.5}, color:"#b09070",
-    meaning:"免疫與白蛋白的平衡指標。<1.2需警惕慢性肝病或腎病。目前1.2正常下緣，在CKD背景下需持續追蹤趨勢。"
-  },
-
-  // ── 礦物質/電解質 ──────────────────────────────────────
-  Calcium:{
-    label:"鈣", tag:"礦物質", cat:"電解質", unit:"mg/dL",
-    ref:{low:8.6, high:10.1}, color:"#7a9e8a",
-    meaning:"CKD患者鈣代謝常出現異常（高磷→低鈣→PTH升高）。目前9.1–9.4正常，配合PTH控制良好，鈣磷代謝目前尚穩定。"
-  },
-  Phosphorus:{
-    label:"磷", tag:"礦物質", cat:"電解質", unit:"mg/dL",
-    ref:{low:2.5, high:4.7}, color:"#7a9e8a",
-    meaning:"CKD患者腎臟排磷能力下降，磷蓄積會誘發繼發性副甲亢及血管鈣化。目前3.1–3.5在正常範圍，顯示腎功能尚可維持磷代謝。"
-  },
-  Magnesium:{
-    label:"鎂", tag:"礦物質", cat:"電解質", unit:"mg/dL",
-    ref:{low:1.8, high:2.4}, color:"#7a9e8a",
-    meaning:"300多種酵素反應的輔因子。補充鎂有助支持葉酸代謝，間接降低同半胱胺酸。CKD患者若腎功能惡化，鎂可能蓄積。目前2.2正常。"
-  },
-  Potassium:{
-    label:"鉀", tag:"礦物質", cat:"電解質", unit:"mEq/L",
-    ref:{low:3.5, high:5.3}, color:"#7a9e8a",
-    meaning:"CKD患者最需監控的電解質之一。腎功能惡化→鉀排出減少→高血鉀→心律不整風險。目前4.1–4.4在正常範圍，但需隨eGFR下降而更頻繁監測。"
-  },
-  Sodium:{
-    label:"鈉", tag:"礦物質", cat:"電解質", unit:"mEq/L",
-    ref:{low:135, high:148}, color:"#7a9e8a",
-    meaning:"調節體液平衡與血壓的核心電解質。CKD患者應限制鈉攝取（<2g/天），以減少蛋白尿與血壓負擔。目前138正常。"
-  },
-
-  // ── 血液常規 ─────────────────────────────────────────
-  WBC:{
-    label:"白血球 WBC", tag:"血液常規", cat:"血液", unit:"×10³/μL",
-    ref:{low:4.5, high:10}, color:"#7a9e8a",
-    meaning:"免疫防禦細胞總數。CKD患者免疫功能常受損，感染風險上升。目前6.02正常，無急性感染或免疫抑制跡象。"
-  },
-  Hemoglobin:{
-    label:"血色素 Hemoglobin", tag:"血液常規", cat:"血液", unit:"g/dL",
-    ref:{low:13, high:17}, color:"#7a9e8a",
-    meaning:"CKD相關貧血（腎性貧血）的重要指標。腎臟產生的EPO減少→紅血球生成下降→貧血。目前13.7在正常下緣，屬臨界值，需持續追蹤。"
-  },
-  Hematocrit:{
-    label:"血球比容 Hematocrit", tag:"血液常規", cat:"血液", unit:"%",
-    ref:{low:40, high:52}, color:"#7a9e8a",
-    meaning:"紅血球佔血液體積的比例。40.8屬正常下緣，與Hemoglobin 13.7一致。CKD患者應維持Hb>10–11 g/dL以避免貧血症狀。"
-  },
-  Platelet:{
-    label:"血小板 Platelet", tag:"血液常規", cat:"血液", unit:"×10³/μL",
-    ref:{low:120, high:350}, color:"#7a9e8a",
-    meaning:"血液凝固功能指標。目前207正常，無出血傾向或血小板過多問題。CKD患者血小板功能可能受影響，但數量正常。"
+  function switchTab(id, el) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-};
-
-const CATEGORIES = ["全部","腎臟","心血管","血糖","免疫","內分泌","代謝","肝臟","蛋白","電解質","血液"];
-
-// ═══════════════════════════════════════════════════════
-// DATA STORE  (民國年→西元：114+1911=2025)
-// ═══════════════════════════════════════════════════════
-let allData = {
-  "2025-07-03":{
-    eGFR:49.76, CRE_blood:1.53,
-    TG:180, LDL:163, HDL:35, TotalCholesterol:224,
-    FBG:102, HbA1c:5.8, UricAcid:6,
-    ALT:17, TSH:3,
-    Microalbumin:186.5, MC_ratio:224.7,
-    Sodium:138, Potassium:4.4,
-    Calcium:9.4
-  },
-  "2025-07-28":{
-    eGFR:50.91, CRE_blood:1.5, BUN:20.9,
-    TG:101, FBG:98,
-    ALT:13, Potassium:4.2
-  },
-  "2025-08-22":{
-    eGFR:54.94, CRE_blood:1.4, BUN:21,
-    TG:120, LDL:77, FBG:102, HbA1c:5.8,
-    UricAcid:5.5, ALT:15,
-    Microalbumin:77.9, MC_ratio:199.2,
-    Urine24hProtein:248.1
-  },
-  "2025-09-10":{
-    eGFR:55.63, CRE_blood:1.44, BUN:22.9,
-    Calcium:9.1, Phosphorus:3.5, Potassium:4.1,
-    UricAcid:3.9, FBG:94,
-    "PTH-i":82.9, NTproBNP:30.7,
-    Eosinophil_abs:560, Eosinophil_pct:7.1,
-    WBC:6.02, Hemoglobin:13.7, Hematocrit:40.8, Platelet:207,
-    "Total Protein":7.1, Albumin:55.0, "A/G Ratio":1.2,
-    "γ-GT":20, LDH:186
-  },
-  "2025-10-29":{
-    eGFR:55.17, CRE_blood:1.45, BUN:19.4,
-    Eosinophil_abs:560
-  },
-  "2025-12-22":{
-    eGFR:49.77, CRE_blood:1.58, BUN:27.8,
-    TG:152, LDL:69, FBG:102, HbA1c:5.8,
-    UricAcid:5, ALT:17,
-    Eosinophil_abs:430,
-    "PTH-i":49.4,
-    Urine24hProtein:109.2
-  },
-  "2026-03-26":{
-    Homocysteine:25.3,
-    "Total Protein":7.1, Albumin:55.0, "A/G Ratio":1.2,
-    Calcium:9.4, Phosphorus:3.1, Magnesium:2.2,
-    "γ-GT":20, LDH:186, "PTH-i":50.9
-  }
-};
-
-let currentFilter="all";
-let currentCat="全部";
-const chartInstances={};
-
-// ═══════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════
-const sortedDates=()=>Object.keys(allData).sort();
-const latestDate=()=>{const d=sortedDates();return d[d.length-1];};
-function getStatus(key,val){
-  const c=CLINICAL[key];if(!c)return"normal";
-  if(val>c.ref.high)return"high";
-  if(val<c.ref.low&&c.ref.low>0)return"low";
-  return"normal";
-}
-function datesForKey(key){return sortedDates().filter(d=>allData[d]?.[key]!==undefined);}
-function trendArrow(curr,prev){
-  if(prev===undefined)return{txt:"—",cls:"trend-flat"};
-  const diff=+(curr-prev).toFixed(2);
-  if(diff===0)return{txt:"→ 持平",cls:"trend-flat"};
-  return diff>0?{txt:`▲ +${Math.abs(diff)}`,cls:"trend-up"}:{txt:`▼ −${Math.abs(diff)}`,cls:"trend-down"};
-}
-
-// ═══════════════════════════════════════════════════════
-// RENDER
-// ═══════════════════════════════════════════════════════
-function render(){
-  const ld=latestDate();
-  const ldat=allData[ld]||{};
-  const all=sortedDates();
-
-  // Collect all keys that have ANY data across all dates
-  const allKeys=Object.keys(CLINICAL).filter(k=>all.some(d=>allData[d]?.[k]!==undefined));
-
-  // Latest value per key (use latest date that has the key)
-  function latestVal(key){
-    const dates=datesForKey(key);
-    if(!dates.length)return undefined;
-    return allData[dates[dates.length-1]][key];
-  }
-
-  const abnormal=allKeys.filter(k=>{const v=latestVal(k);return v!==undefined&&getStatus(k,v)!=="normal";});
-  const normal  =allKeys.filter(k=>{const v=latestVal(k);return v!==undefined&&getStatus(k,v)==="normal";});
-
-  // meta
-  document.getElementById("meta-line").innerHTML=
-    `最新報告：<strong>${ld}</strong>　|　`+
-    `<span style="color:${abnormal.length>0?"var(--danger)":"var(--ok)"};font-weight:600">${abnormal.length} 項異常</span>`+
-    `　/　${allKeys.length} 項追蹤中　|　${all.length} 次採檢`;
-  document.getElementById("tab-abnormal").textContent=`異常（${abnormal.length}）`;
-  document.getElementById("tab-normal").textContent=`正常（${normal.length}）`;
-
-  // alert
-  const banner=document.getElementById("alert-banner");
-  if(abnormal.length>0&&currentFilter!=="normal"){
-    banner.classList.remove("hidden");
-    document.getElementById("alert-items").textContent=abnormal.map(k=>CLINICAL[k]?.label).join("、");
-  }else banner.classList.add("hidden");
-
-  // category tabs
-  buildCatTabs(allKeys,abnormal);
-
-  // filter by status
-  let displayKeys=currentFilter==="abnormal"?abnormal:currentFilter==="normal"?normal:[...abnormal,...normal];
-  // filter by category
-  if(currentCat!=="全部") displayKeys=displayKeys.filter(k=>CLINICAL[k]?.cat===currentCat);
-
-  const container=document.getElementById("cards-container");
-  container.innerHTML="";
-
-  // group by cat for section titles
-  const catOrder=["腎臟","心血管","血糖","免疫","內分泌","代謝","肝臟","蛋白","電解質","血液"];
-  const grouped={};
-  displayKeys.forEach(k=>{
-    const c=CLINICAL[k]?.cat||"其他";
-    if(!grouped[c])grouped[c]=[];
-    grouped[c].push(k);
-  });
-
-  const orderedCats=currentCat!=="全部"?[currentCat]:catOrder.filter(c=>grouped[c]);
-  orderedCats.forEach(cat=>{
-    if(!grouped[cat])return;
-    const sec=document.createElement("div");
-    sec.className="section-title";
-    sec.textContent=cat;
-    container.appendChild(sec);
-    grouped[cat].forEach(key=>buildCard(key,container));
-  });
-}
-
-function buildCatTabs(allKeys,abnormal){
-  const catsWithData=[...new Set(allKeys.map(k=>CLINICAL[k]?.cat).filter(Boolean))];
-  const ordered=["腎臟","心血管","血糖","免疫","內分泌","代謝","肝臟","蛋白","電解質","血液"].filter(c=>catsWithData.includes(c));
-  const wrap=document.getElementById("cat-tabs");
-  wrap.innerHTML="";
-  ["全部",...ordered].forEach(cat=>{
-    const btn=document.createElement("button");
-    btn.className="cat-tab"+(currentCat===cat?" active":"");
-    const cnt=cat==="全部"?"":` (${allKeys.filter(k=>CLINICAL[k]?.cat===cat).length})`;
-    btn.textContent=cat+cnt;
-    btn.onclick=()=>{currentCat=cat;document.querySelectorAll(".cat-tab").forEach(b=>b.classList.remove("active"));btn.classList.add("active");render();};
-    wrap.appendChild(btn);
-  });
-}
-
-function buildCard(key,container){
-  const c=CLINICAL[key];if(!c)return;
-  const keyDates=datesForKey(key);
-  if(!keyDates.length)return;
-  const lv=allData[keyDates[keyDates.length-1]][key];
-  if(lv===undefined)return;
-  const status=getStatus(key,lv);
-  const hasHist=keyDates.length>1;
-  const latestDateForKey=keyDates[keyDates.length-1];
-
-  // range bar
-  const span=c.ref.high>900?lv*2:c.ref.high-c.ref.low;
-  let dotPct=c.ref.high>900?50:((lv-c.ref.low)/span)*100;
-  dotPct=Math.max(2,Math.min(98,dotPct));
-  const dotColor=status==="high"?"var(--danger)":status==="low"?"var(--warn)":"var(--ok)";
-
-  // table rows (newest first)
-  const tableRows=[...keyDates].reverse().map((d,i,arr)=>{
-    const v=allData[d][key];
-    const prevD=arr[i+1];
-    const prev=prevD?allData[prevD][key]:undefined;
-    const tr=trendArrow(v,prev);
-    const isLat=d===latestDateForKey;
-    const tag=isLat?`<span style="font-size:10px;background:rgba(143,163,168,.2);color:var(--accent);padding:1px 7px;border-radius:8px;border:1px solid var(--accent)">最新</span>`:"";
-    return`<tr class="${isLat?"latest-row":""}"><td>${d}</td><td><strong>${v}</strong> ${c.unit}</td><td class="${tr.cls}">${tr.txt}</td><td>${tag}</td></tr>`;
-  }).join("");
-
-  const safeid=key.replace(/[^a-z0-9]/gi,"_");
-  const cardEl=document.createElement("div");
-  cardEl.className="card"+(status!=="normal"?" abnormal":"");
-  cardEl.innerHTML=`
-    <div class="card-top">
-      <div>
-        <div class="card-title-row">
-          <span class="card-title">${c.label}</span>
-          <span class="card-tag">${c.tag}</span>
-        </div>
-        <div class="card-key">${key}　·　最新: ${latestDateForKey}</div>
-      </div>
-      <div class="card-right">
-        <div class="card-value" style="color:${status!=="normal"?c.color:"var(--text)"}">
-          ${lv}<span class="card-unit">${c.unit}</span>
-        </div>
-        ${status==="high"?'<span class="badge badge-danger">偏高 ▲</span>':status==="low"?'<span class="badge badge-warn">偏低 ▼</span>':'<span class="badge badge-ok">正常</span>'}
-      </div>
-    </div>
-    <div class="card-ref">
-      參考範圍：${c.ref.low===0?"< "+c.ref.high:c.ref.high>900?"≥ "+c.ref.low:c.ref.low+" – "+c.ref.high} ${c.unit}
-      &ensp;|&ensp; 共 <strong>${keyDates.length}</strong> 次採檢
-    </div>
-    <div class="range-bar-bg">
-      <div class="range-bar-ok"></div>
-      <div class="range-bar-dot" style="left:${dotPct}%;background:${dotColor}"></div>
-    </div>
-    <div class="chart-wrap"><canvas id="chart_${safeid}"></canvas></div>
-    <div class="chart-legend">
-      <div class="chart-legend-item"><div class="legend-dot" style="background:${c.color}"></div><span>實測值</span></div>
-      <div class="chart-legend-item"><div class="legend-dash" style="border-top-color:var(--danger)"></div><span>上限 ${c.ref.high>900?"∞":c.ref.high}</span></div>
-      ${c.ref.low>0?`<div class="chart-legend-item"><div class="legend-dash" style="border-top-color:var(--warn)"></div><span>下限 ${c.ref.low}</span></div>`:""}
-    </div>
-    ${hasHist?`
-    <div class="history-toggle" onclick="toggleSection(this,'htable_${safeid}','▶','▼')">
-      <span>▶</span><span>歷史紀錄（共 ${keyDates.length} 筆）</span>
-    </div>
-    <div class="history-table-wrap" id="htable_${safeid}">
-      <table class="history-table">
-        <thead><tr><th>採檢日期</th><th>數值</th><th>較前次</th><th></th></tr></thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-    </div>`:`<div class="no-history">尚無歷史紀錄</div>`}
-    <hr class="divider">
-    <div class="meaning-toggle" onclick="toggleSection(this,'meaning_${safeid}','▼','▲')">
-      <span>▼</span> 臨床意義
-    </div>
-    <div class="meaning-box" id="meaning_${safeid}">${c.meaning}</div>
-  `;
-  container.appendChild(cardEl);
-  requestAnimationFrame(()=>drawChart(key,keyDates,c,safeid));
-}
-
-// ═══════════════════════════════════════════════════════
-// CHART
-// ═══════════════════════════════════════════════════════
-function drawChart(key,dates,c,safeid){
-  const cvs=document.getElementById("chart_"+safeid);
-  if(!cvs)return;
-  if(chartInstances[key])chartInstances[key].destroy();
-  const labels=dates.map(d=>d.slice(5));
-  const values=dates.map(d=>allData[d][key]);
-  const ctx=cvs.getContext("2d");
-  const grad=ctx.createLinearGradient(0,0,0,95);
-  grad.addColorStop(0,c.color+"55");grad.addColorStop(1,c.color+"00");
-  const ptColors=values.map(v=>{const s=getStatus(key,v);return s==="high"?"#b07070":s==="low"?"#b09070":c.color;});
-  chartInstances[key]=new Chart(ctx,{
-    type:"line",
-    data:{labels,datasets:[{
-      data:values,borderColor:c.color,borderWidth:2,backgroundColor:grad,
-      pointBackgroundColor:ptColors,pointBorderColor:"#fff",pointBorderWidth:1.5,
-      pointRadius:5,pointHoverRadius:7,fill:true,tension:0.35,spanGaps:true
-    }]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{backgroundColor:"#f8f4f0",titleColor:"#8c7f7a",bodyColor:"#4a4240",borderColor:"#d9cfc7",borderWidth:1,padding:10,
-          callbacks:{title:items=>dates[items[0].dataIndex],label:ctx=>`${ctx.parsed.y} ${c.unit}`}}
-      },
-      scales:{
-        x:{grid:{color:"#ebe5de"},ticks:{color:"#8c7f7a",font:{size:10}},border:{display:false}},
-        y:{grid:{color:"#ebe5de"},ticks:{color:"#8c7f7a",font:{size:10}},border:{display:false},
-          suggestedMin:Math.min(...values,c.ref.low>0&&c.ref.high<900?c.ref.low:values[0])*0.88,
-          suggestedMax:Math.max(...values,c.ref.high<900?c.ref.high:values[0])*1.12}
-      }
-    },
-    plugins:[{id:"refLines",afterDraw(chart){
-      const{ctx,chartArea:{left,right,top,bottom},scales:{y}}=chart;
-      const dl=(val,color)=>{
-        const yp=y.getPixelForValue(val);
-        if(yp<top||yp>bottom)return;
-        ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle=color;ctx.lineWidth=1;ctx.globalAlpha=0.65;
-        ctx.beginPath();ctx.moveTo(left,yp);ctx.lineTo(right,yp);ctx.stroke();ctx.restore();
-      };
-      if(c.ref.high<900)dl(c.ref.high,"#b07070");
-      if(c.ref.low>0)dl(c.ref.low,"#b09070");
-    }}]
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// TOGGLES / FILTER
-// ═══════════════════════════════════════════════════════
-function toggleSection(el,targetId,closed,open){
-  const target=document.getElementById(targetId);if(!target)return;
-  const isOpen=target.classList.toggle("open");
-  const arrow=el.querySelector("span");if(arrow)arrow.textContent=isOpen?open:closed;
-}
-function setFilter(f,btn){
-  currentFilter=f;
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  btn.classList.add("active");render();
-}
-
-// ═══════════════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════════════
-function openModal(){
-  const grid=document.getElementById("modal-grid");
-  grid.innerHTML=`<div class="date-field"><div class="field-label">採檢日期</div><input class="field-input" type="date" id="modal-date" value="${new Date().toISOString().slice(0,10)}"></div>`;
-  Object.entries(CLINICAL).forEach(([key,c])=>{
-    const id="mf_"+key.replace(/[^a-z0-9]/gi,"_");
-    const div=document.createElement("div");
-    div.innerHTML=`<div class="field-label">${c.label}<span style="color:var(--soft);font-size:10px;margin-left:4px">${c.unit||"—"}</span></div><input class="field-input" type="number" step="0.01" id="${id}" placeholder="${c.ref.low>0&&c.ref.high<900?c.ref.low+"–"+c.ref.high:""}">`;
-    grid.appendChild(div);
-  });
-  document.getElementById("modal-overlay").classList.add("open");
-}
-function closeModal(){document.getElementById("modal-overlay").classList.remove("open");}
-function saveData(){
-  const date=document.getElementById("modal-date").value;
-  if(!date){alert("請選擇採檢日期");return;}
-  const entry={};
-  Object.keys(CLINICAL).forEach(key=>{
-    const el=document.getElementById("mf_"+key.replace(/[^a-z0-9]/gi,"_"));
-    if(el&&el.value!=="")entry[key]=parseFloat(el.value);
-  });
-  if(!Object.keys(entry).length){alert("請至少填入一項數值");return;}
-  allData[date]={...(allData[date]||{}),...entry};
-  closeModal();render();
-}
-document.getElementById("modal-overlay").addEventListener("click",function(e){if(e.target===this)closeModal();});
-
-// init
-render();
 </script>
 </body>
 </html>
