@@ -173,11 +173,106 @@
   .section.active>*:nth-child(8){animation-delay:.42s;}
   footer{background:var(--charcoal);color:var(--stone);text-align:center;padding:2rem;font-size:.75rem;letter-spacing:.05em;}
   footer strong{color:var(--taupe);}
-  @media(max-width:768px){
-    .overview-grid,.abnormal-grid,.supp-grid,.avoid-grid,.protein-box,.interp-grid{grid-template-columns:1fr;}
-    .header-inner{flex-direction:column;gap:1.5rem;}
-    .header-meta{text-align:left;}
-    header{padding:2rem;}
+  /* ── TABLET ── */
+  @media(max-width:900px){
+    .overview-grid{grid-template-columns:repeat(2,1fr);}
+    .abnormal-grid{grid-template-columns:repeat(2,1fr);}
+    .supp-grid{grid-template-columns:repeat(2,1fr);}
+    .interp-grid{grid-template-columns:1fr;}
+    .protein-box{grid-template-columns:1fr;}
+  }
+
+  /* ── MOBILE ── */
+  @media(max-width:640px){
+    /* Header */
+    header{padding:1.4rem 1.2rem 1.6rem;}
+    .header-inner{flex-direction:column;gap:1rem;align-items:flex-start;}
+    .header-title{font-size:.65rem;letter-spacing:.2em;}
+    .header-name{font-size:2rem;white-space:nowrap;}
+    .header-meta{text-align:left;font-size:.72rem;line-height:1.7;}
+
+    /* Nav — scrollable horizontal strip */
+    nav{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    nav::-webkit-scrollbar{display:none;}
+    .nav-inner{width:max-content;min-width:100%;}
+    .nav-tab{padding:.7rem .95rem;font-size:.7rem;letter-spacing:.04em;}
+
+    /* Main */
+    main{padding:1.4rem 1rem 4rem;}
+
+    /* Section title */
+    .section-label{font-size:.62rem;letter-spacing:.25em;}
+    .section-title{font-size:1.35rem;margin-bottom:1.6rem;padding-bottom:.8rem;word-break:keep-all;}
+
+    /* Overview cards */
+    .overview-grid{grid-template-columns:repeat(2,1fr);gap:.8rem;margin-bottom:1.8rem;}
+    .ov-card{padding:1.1rem;}
+    .ov-label{font-size:.68rem;}
+    .ov-value{font-size:1.8rem;}
+    .ov-sub{font-size:.65rem;}
+
+    /* Alert / Abnormal */
+    .alert-section{padding:1.2rem;margin-bottom:1.8rem;}
+    .abnormal-grid{grid-template-columns:1fr;gap:.7rem;}
+    .abn-value{font-size:1.3rem;}
+
+    /* Data group */
+    .data-group{padding:1.2rem;margin-bottom:1.4rem;}
+    .data-group-title{font-size:.76rem;}
+    .clinical-note{font-size:.72rem;padding:.7rem .9rem;}
+
+    /* Table — horizontal scroll */
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -1.2rem;padding:0 1.2rem;}
+    table{font-size:.76rem;min-width:480px;}
+    thead th{font-size:.65rem;padding:.5rem .7rem;}
+    tbody td{padding:.55rem .7rem;}
+
+    /* Trend */
+    .trend-section{padding:1.2rem;}
+    .trend-point{font-size:.65rem;}
+
+    /* Supplement */
+    .supp-grid{grid-template-columns:1fr;gap:1rem;margin-bottom:1.8rem;}
+    .supp-card{padding:1.3rem;}
+    .supp-icon{width:38px;height:38px;font-size:1.1rem;}
+    .supp-name{font-size:.88rem;}
+    .supp-dose{font-size:1rem;}
+    .supp-reason{font-size:.73rem;}
+
+    /* Avoid */
+    .avoid-grid{grid-template-columns:1fr;gap:.7rem;margin-bottom:1.8rem;}
+
+    /* Protein box */
+    .protein-box{grid-template-columns:1fr;gap:1.2rem;padding:1.2rem;}
+
+    /* Steps */
+    .step{padding:1rem 1.2rem;}
+    .step-num{font-size:1.5rem;min-width:26px;}
+    .step-title{font-size:.82rem;}
+    .step-desc{font-size:.73rem;}
+
+    /* Interp cards */
+    .interp-grid{grid-template-columns:1fr;gap:1rem;}
+    .interp-card{padding:1.3rem;}
+    .ic-name{font-size:.82rem;}
+    .ic-val{font-size:1.45rem;}
+    .ic-meaning{font-size:.73rem;}
+
+    /* Chain */
+    .chain-section{padding:1.2rem;}
+    .chain{padding:.8rem .9rem;gap:.25rem;}
+    .chain-node{font-size:.68rem;padding:.25rem .6rem;white-space:normal;}
+    .chain-label{font-size:.68rem;padding-left:.8rem;}
+
+    /* Footer */
+    footer{padding:1.4rem 1.2rem;font-size:.7rem;line-height:1.7;}
+  }
+
+  /* ── VERY SMALL (≤375px) ── */
+  @media(max-width:375px){
+    .header-name{font-size:1.7rem;}
+    .overview-grid{grid-template-columns:1fr;}
+    .nav-tab{padding:.65rem .8rem;font-size:.65rem;}
   }
 </style>
 </head>
@@ -294,7 +389,7 @@
       <strong>微白蛋白</strong>是腎絲球損傷最早期訊號，正常 &lt;25 mg/L。114/07 高達 186.5 mg/L（正常值 7 倍），代表腎絲球屏障已嚴重破損。<strong>好消息：24 小時尿蛋白在 114/12 已回落至 109.2（正常範圍）</strong>，是目前所有指標中最重要的正向改善訊號。<br>
       <strong>M/C ratio</strong>修正尿液濃度誤差後的白蛋白/肌酸酐比值，正常 &lt;30。114/07–08 的 224.7% 與 199.2% 均遠超正常，反映持續性蛋白尿，需繼續監測後續趨勢。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>114/07/03</td><td>微白蛋白</td><td class="val-high">186.5</td><td>MG/L</td><td>0–25</td><td><span class="tag-high">嚴重偏高</span></td></tr>
@@ -304,7 +399,7 @@
         <tr><td>114/07/03</td><td>M/C ratio</td><td class="val-high">224.7</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
         <tr><td>114/08/22</td><td>M/C ratio</td><td class="val-high">199.2</td><td>%</td><td>0–30</td><td><span class="tag-high">嚴重偏高</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <div class="data-group">
@@ -313,14 +408,14 @@
       <strong>PTH 偏高是 CKD 的典型繼發反應</strong>：腎功能下降 → 活性 VitD 合成不足 → 鈣吸收減少 → PTH 代償性升高（繼發性副甲狀腺亢進）。長期高 PTH 會造成骨質流失與血管鈣化。<br>
       <strong>目前最佳改善案例</strong>：PTH 從 114/09 的 82.9（異常）→ 2026/03 的 50.9（正常），同期 Vitamin D 達 43.4 ng/mL（充足範圍），顯示維生素 D 補充策略直接有效，是目前所有指標中改善最成功的成果。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>114/09/10</td><td>i-PTH（Excel）</td><td class="val-high">82.9</td><td>pg/mL</td><td>15–68</td><td><span class="tag-high">偏高</span></td></tr>
         <tr><td>2026/03/26</td><td>PTH-i（聯合醫事）</td><td class="val-ok">50.9</td><td>pg/mL</td><td>18.5–88.0</td><td><span class="tag-ok">正常 ↓改善</span></td></tr>
         <tr><td>2026/03/26</td><td>25-OH Vitamin D</td><td class="val-ok">43.4</td><td>ng/mL</td><td>充足 30–100</td><td><span class="tag-ok">充足</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 </section>
 
@@ -335,14 +430,14 @@
       <strong>LDL 163（偏高）＋ HDL 35（偏低）</strong>是心血管疾病最危險的血脂組合。高 LDL 在腎臟動脈內皮沉積形成粥狀斑塊，直接導致腎臟慢性缺血；HDL 偏低則喪失保護作用。<br>
       <strong>CKD 患者 LDL 目標值</strong>應控制在 &lt;100 mg/dL（高風險族群甚至 &lt;70 mg/dL），目前 163 與目標差距顯著，建議與心臟科或腎臟科醫師討論是否需要降脂藥物介入。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>114/07/03</td><td>總膽固醇</td><td class="val-high">224</td><td>MG/DL</td><td>100–200</td><td><span class="tag-high">偏高</span></td></tr>
         <tr><td>114/07/03</td><td>LDL 低密度脂蛋白</td><td class="val-high">163</td><td>MG/DL</td><td>50–129</td><td><span class="tag-high">偏高</span></td></tr>
         <tr><td>114/07/03</td><td>HDL 高密度脂蛋白</td><td class="val-low">35</td><td>MG/DL</td><td>≥ 40</td><td><span class="tag-low">偏低</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <div class="data-group">
@@ -351,14 +446,14 @@
       <strong>三次採檢均為 102 mg/dL</strong>，驚人的一致性（正常上限 99）。屬「糖尿病前期（Pre-diabetes）」警戒區。糖化終產物（AGEs）在血管壁堆積，直接損害腎絲球基底膜的負電荷屏障，使蛋白質漏出 → 加速 eGFR 下降。糖尿病腎病變是台灣最常見 CKD 成因。<br>
       <strong>建議追蹤 HbA1c</strong>（反映近 3 個月平均血糖），若 HbA1c ≥5.7% 即確認糖尿病前期，需積極飲食介入。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>114/07/03</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
         <tr><td>114/08/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">邊緣值</span></td></tr>
         <tr><td>114/12/22</td><td>飯前血糖</td><td class="val-high">102</td><td>MG/DL</td><td>60–99</td><td><span class="tag-high">持續邊緣</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <div class="data-group">
@@ -368,14 +463,14 @@
       ① <strong>過敏性間質性腎炎（AIN）</strong>：某些藥物（NSAIDs、抗生素、利尿劑、中草藥）可引發腎臟間質發炎，嗜酸球浸潤直接損傷腎小管，造成 eGFR 下降。AIN 是<strong>可逆性腎損傷</strong>，早期停藥有機會部分恢復。<br>
       ② IgE 51.1（正常），較不支持嚴重過敏；血清蛋白電泳已排除骨髓瘤。<strong>建議告知醫師完整用藥史</strong>。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>日期</th><th>指標</th><th>數值</th><th>單位</th><th>正常範圍</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>114/09/10</td><td>嗜酸性白血球 %</td><td class="val-high">7.1</td><td>%</td><td>0–5</td><td><span class="tag-high">偏高</span></td></tr>
         <tr><td>114/10/29</td><td>嗜酸性白血球計算</td><td class="val-high">560</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">偏高</span></td></tr>
         <tr><td>114/12/22</td><td>嗜酸性白血球計算</td><td class="val-high">430</td><td>cell/μL</td><td>50–350</td><td><span class="tag-high">仍偏高</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 </section>
 
@@ -390,7 +485,7 @@
       <strong>磷（3.1）與鈣（9.4）均正常</strong>——CKD 患者常因腎臟調節失常而異常，目前維持正常是積極管理的成果。<strong>Magnesium 鎂（2.2）正常</strong>，CKD 患者常見鎂蓄積，目前無問題。<br>
       <strong>A/G Ratio 1.20</strong>（正常低邊緣，正常 1.2–2.0），反映白蛋白相對偏低，與慢性腎病蛋白質流失一致。<strong>γ-GT（20）與 LDH（186）正常</strong>，排除急性肝臟或心肌損傷。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>IgG/A/M Kappa/Lambda (EP)</td><td>No Paraprotein</td><td>—</td><td>—</td><td><span class="tag-ok">正常</span></td></tr>
@@ -402,7 +497,7 @@
         <tr><td>Magnesium 鎂</td><td class="val-ok">2.2</td><td>mg/dL</td><td>1.8–2.4</td><td><span class="tag-ok">正常</span></td></tr>
         <tr><td>A/G Ratio</td><td class="val-ok">1.20</td><td>—</td><td>1.2–2.0</td><td><span class="tag-ok">低邊緣</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <div class="data-group">
@@ -411,7 +506,7 @@
       <strong>Homocysteine 25.3 umol/L（唯一異常 H）</strong>：最新報告最重要的發現。Hcy 是胺基酸代謝中間產物，偏高直接損傷血管內皮、加速動脈硬化，且腎功能下降使 Hcy 排出減少，形成「eGFR 低 → Hcy 高 → 血管損傷 → eGFR 更低」的惡性循環。葉酸＋B6＋B12 是首要補充目標。<br>
       <strong>hs-CRP 0.050（極低風險）</strong>：令人驚訝。儘管 eGFR 持續低下，目前無顯著全身急性發炎，提示腎損傷主因是<strong>代謝性（血糖、血脂）而非免疫發炎性</strong>。<strong>C3 補體 132 正常</strong>，排除狼瘡性腎炎等補體消耗型自體免疫腎炎。
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>檢驗項目</th><th>數值</th><th>單位</th><th>參考區間</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td style="color:var(--warn-red);font-weight:400">Homocysteine 同半胱胺酸</td><td class="val-high">25.3</td><td>umol/L</td><td>6.5–19.5</td><td><span class="tag-high">偏高 H</span></td></tr>
@@ -424,7 +519,7 @@
         <tr><td>M-peak</td><td>Negative</td><td>—</td><td>Negative</td><td><span class="tag-ok">正常</span></td></tr>
         <tr><td>Albumin(S)</td><td class="val-ok">55.0</td><td>%</td><td>47.0–61.6</td><td><span class="tag-ok">正常</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 
   <div class="data-group">
@@ -440,7 +535,7 @@
         <div style="font-size:.75rem;color:var(--stone);margin-top:.2rem;">免疫固定電泳 SP · IgG · IgA · IgM · Kappa · Lambda 六道均陰性，排除多發性骨髓瘤及漿細胞病變</div>
       </div>
     </div>
-    <table>
+    <div class="table-wrap"><table>
       <thead><tr><th>分區</th><th>實測 %</th><th>參考範圍 %</th><th>g/dL</th><th>狀態</th></tr></thead>
       <tbody>
         <tr><td>Albumin 白蛋白</td><td class="val-ok">55.0</td><td>47.0–61.6</td><td>3.9</td><td><span class="tag-ok">正常</span></td></tr>
@@ -451,7 +546,7 @@
         <tr style="border-top:2px solid var(--taupe)"><td style="font-weight:400;color:var(--charcoal)">Total</td><td colspan="2">—</td><td style="font-weight:400">7.1</td><td><span class="tag-ok">正常</span></td></tr>
         <tr><td>A/G Ratio</td><td colspan="2">—</td><td class="val-ok">1.2</td><td><span class="tag-ok">正常</span></td></tr>
       </tbody>
-    </table>
+    </table></div>
   </div>
 </section>
 
